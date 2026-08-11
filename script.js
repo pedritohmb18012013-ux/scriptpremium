@@ -3,7 +3,7 @@
   Os códigos ainda serão colocados em um backend seguro da Vercel.
   NÃO coloque códigos reais aqui, pois este arquivo ficará no GitHub.
 */
-const PLATFORM_URL = "https://plataformdestroyer.fun";
+const PLATFORM_URL = "https://platformdestroyer.fun";
 
 function openAccess(){document.getElementById("modal").classList.remove("hidden");document.getElementById("code").focus()}
 function closeAccess(){document.getElementById("modal").classList.add("hidden");document.getElementById("message").innerHTML=""}
