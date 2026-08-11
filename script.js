@@ -13,7 +13,46 @@ function closeAccess(){document.getElementById("modal").classList.add("hidden");
   Na próxima etapa vamos trocar esta função por uma consulta
   ao backend, onde os códigos mensais ficarão protegidos.
 */
-function validateCode(){
-  const msg=document.getElementById("message");
-  msg.innerHTML='<div class="error">Sistema de códigos será conectado na próxima etapa.</div>';
+async function validateCode(){
+  const msg = document.getElementById("message");
+  const code = document.getElementById("code").value.trim();
+
+  if (!code) {
+    msg.innerHTML = '<div class="error">Digite o código de acesso.</div>';
+    return;
+  }
+
+  msg.innerHTML = '<div>Verificando...</div>';
+
+  try {
+    const response = await fetch("https://scriptpremium.vercel.app/api/validate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ code })
+    });
+
+    const data = await response.json();
+
+    if (data.valid) {
+      msg.innerHTML = `
+        <div class="success">
+          Código válido! Acesso liberado até ${data.expires}.
+        </div>
+      `;
+
+      window.location.href = PLATFORM_URL;
+    } else {
+      msg.innerHTML = `
+        <div class="error">${data.error || "Código inválido."}</div>
+      `;
+    }
+  } catch (error) {
+    msg.innerHTML = `
+      <div class="error">
+        Não foi possível conectar ao servidor.
+      </div>
+    `;
+  }
 }
