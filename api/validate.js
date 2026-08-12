@@ -8,24 +8,31 @@ export default function handler(req, res) {
 
   const { code } = req.body || {};
 
-  const expected = process.env.ACCESS_CODE;
+  const codes = process.env.ACCESS_CODES;
   const expires = process.env.ACCESS_EXPIRES;
 
-  if (!expected || !expires) {
+  if (!codes || !expires) {
     return res.status(500).json({
       valid: false,
       error: "Sistema ainda não configurado."
     });
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const validCodes = codes
+    .split(",")
+    .map(item => item.trim().toUpperCase())
+    .filter(Boolean);
 
-  if (String(code || "").trim().toUpperCase() !== expected.toUpperCase()) {
+  const enteredCode = String(code || "").trim().toUpperCase();
+
+  if (!validCodes.includes(enteredCode)) {
     return res.status(401).json({
       valid: false,
       error: "Código inválido."
     });
   }
+
+  const today = new Date().toISOString().slice(0, 10);
 
   if (today > expires) {
     return res.status(401).json({
