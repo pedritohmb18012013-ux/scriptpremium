@@ -6,43 +6,95 @@
 <title>Script Premium — Uso selecionado para a Sala do Futuro</title>
 <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-<div class="glow glow1"></div><div class="glow glow2"></div>
-<header><div class="status"><span></span> ACESSO ATIVO</div><div class="menu">☰</div></header>
+
+<div class="glow glow1"></div>
+<div class="glow glow2"></div>
+
+<header>
+  <div class="status">
+    <span></span> ACESSO ATIVO
+  </div>
+
+  <div class="menu">☰</div>
+</header>
 
 <main>
+
 <section class="hero">
   <div class="logo">⌘</div>
-  <div><h1>Script <b>Premium</b></h1><p>Uso selecionado para Sala do Futuro</p></div>
+
+  <div>
+    <h1>Script <b>Premium</b></h1>
+    <p>Uso selecionado para Sala do Futuro</p>
+  </div>
 </section>
 
 <section class="cards">
+
   <article class="card">
+
     <span class="tag">ALL-IN-ONE</span>
+
     <h2>Platform Destroyer</h2>
-    <p>Central de acesso ao Platform Destroyer.</p>
+
+    <p>
+      Central de acesso ao Platform Destroyer.
+    </p>
+
     <div class="buttons">
-      <button class="primary" onclick="openAccess()">SITE ↗</button>
-      <button onclick="openAccess()">DISCORD</button>
+
+      <button class="primary" onclick="openAccess()">
+        SITE ↗
+      </button>
+
     </div>
+
   </article>
+
 </section>
 
-<footer>© 2026 Script Premium</footer>
+<footer>
+  © 2026 Script Premium
+</footer>
+
 </main>
 
 <div id="modal" class="modal hidden">
+
   <div class="modalBox">
-    <button class="close" onclick="closeAccess()">×</button>
+
+    <button class="close" onclick="closeAccess()">
+      ×
+    </button>
+
     <div class="keyIcon">🔐</div>
+
     <h2>Acesso protegido</h2>
-    <p>Digite o código mensal fornecido pelo administrador.</p>
-    <input id="code" type="text" placeholder="XXXX-XXXX-XXXX" autocomplete="off">
-    <button class="validate" onclick="validateCode()">VALIDAR CÓDIGO</button>
+
+    <p>
+      Digite o código mensal fornecido pelo administrador.
+    </p>
+
+    <input
+      id="code"
+      type="text"
+      placeholder="XXXX-XXXX-XXXX"
+      autocomplete="off"
+    >
+
+    <button class="validate" onclick="validateCode()">
+      VALIDAR CÓDIGO
+    </button>
+
     <div id="message"></div>
+
   </div>
+
 </div>
 
 <script src="script.js"></script>
+
 </body>
 </html>
