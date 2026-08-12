@@ -9,9 +9,8 @@ export default function handler(req, res) {
   const { code } = req.body || {};
 
   const codes = process.env.ACCESS_CODES;
-  const expires = process.env.ACCESS_EXPIRES;
 
-  if (!codes || !expires) {
+  if (!codes) {
     return res.status(500).json({
       valid: false,
       error: "Sistema ainda não configurado."
@@ -20,12 +19,21 @@ export default function handler(req, res) {
 
   const validCodes = codes
     .split(",")
-    .map(item => item.trim().toUpperCase())
-    .filter(Boolean);
+    .map(item => {
+      const [codeValue, expires] = item.split("|");
+
+      return {
+        code: codeValue.trim().toUpperCase(),
+        expires: expires.trim()
+      };
+    })
+    .filter(item => item.code && item.expires);
 
   const enteredCode = String(code || "").trim().toUpperCase();
 
-  if (!validCodes.includes(enteredCode)) {
+  const found = validCodes.find(item => item.code === enteredCode);
+
+  if (!found) {
     return res.status(401).json({
       valid: false,
       error: "Código inválido."
@@ -34,7 +42,7 @@ export default function handler(req, res) {
 
   const today = new Date().toISOString().slice(0, 10);
 
-  if (today > expires) {
+  if (today > found.expires) {
     return res.status(401).json({
       valid: false,
       error: "Código expirado."
@@ -43,6 +51,6 @@ export default function handler(req, res) {
 
   return res.status(200).json({
     valid: true,
-    expires: expires
+    expires: found.expires
   });
 }
