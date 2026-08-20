@@ -12,9 +12,21 @@ function closeAccess() {
 
   const paymentArea = document.getElementById("paymentArea");
   const message = document.getElementById("message");
+  const receipt = document.getElementById("receipt");
+  const fileName = document.getElementById("fileName");
+  const sendButton = document.getElementById("sendReceipt");
 
   paymentArea.classList.add("hidden");
   message.innerHTML = "";
+  fileName.innerHTML = "";
+
+  if (receipt) {
+    receipt.value = "";
+  }
+
+  if (sendButton) {
+    sendButton.disabled = true;
+  }
 
   selectedAmount = null;
   selectedDays = null;
@@ -26,6 +38,7 @@ function selectPlan(amount, days) {
 
   const paymentArea = document.getElementById("paymentArea");
   const selectedPlan = document.getElementById("selectedPlan");
+  const message = document.getElementById("message");
 
   paymentArea.classList.remove("hidden");
 
@@ -33,9 +46,9 @@ function selectPlan(amount, days) {
     `Você escolheu <strong>R$ ${amount.toFixed(2).replace(".", ",")}</strong> 
      por <strong>${days} dia${days > 1 ? "s" : ""}</strong>.`;
 
-  document.getElementById("message").innerHTML = "";
+  message.innerHTML = "";
 
-  document.getElementById("paymentArea").scrollIntoView({
+  paymentArea.scrollIntoView({
     behavior: "smooth",
     block: "center"
   });
@@ -49,6 +62,7 @@ async function copyPix() {
 
     document.getElementById("message").innerHTML =
       '<div class="success">Chave Pix copiada!</div>';
+
   } catch (error) {
     document.getElementById("message").innerHTML =
       '<div class="error">Não foi possível copiar. Copie a chave manualmente.</div>';
@@ -68,10 +82,24 @@ function receiptSelected() {
 
   const file = input.files[0];
 
-  if (!file.type.startsWith("image/")) {
+  const isImage = file.type.startsWith("image/");
+  const isPdf = file.type === "application/pdf";
+
+  if (!isImage && !isPdf) {
     sendButton.disabled = true;
+
     fileName.innerHTML =
-      '<div class="error">Selecione uma imagem.</div>';
+      '<div class="error">Selecione uma imagem ou PDF.</div>';
+
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    sendButton.disabled = true;
+
+    fileName.innerHTML =
+      '<div class="error">O arquivo deve ter no máximo 2 MB.</div>';
+
     return;
   }
 
@@ -79,6 +107,22 @@ function receiptSelected() {
     `<div class="success">Comprovante selecionado: ${file.name}</div>`;
 
   sendButton.disabled = false;
+}
+
+function fileToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(new Error("Não foi possível ler o arquivo."));
+    };
+
+    reader.readAsDataURL(file);
+  });
 }
 
 async function sendReceipt() {
@@ -89,61 +133,87 @@ async function sendReceipt() {
   if (!selectedAmount || !selectedDays) {
     msg.innerHTML =
       '<div class="error">Escolha um plano primeiro.</div>';
+
     return;
   }
 
   if (!input.files || !input.files[0]) {
     msg.innerHTML =
       '<div class="error">Selecione o comprovante.</div>';
+
     return;
   }
 
   const file = input.files[0];
 
+  const isImage = file.type.startsWith("image/");
+  const isPdf = file.type === "application/pdf";
+
+  if (!isImage && !isPdf) {
+    msg.innerHTML =
+      '<div class="error">Selecione uma imagem ou PDF.</div>';
+
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    msg.innerHTML =
+      '<div class="error">O arquivo deve ter no máximo 2 MB.</div>';
+
+    return;
+  }
+
   sendButton.disabled = true;
 
   msg.innerHTML =
-    '<div>Enviando comprovante...</div>';
+    "<div>Enviando comprovante...</div>";
 
   try {
-    const formData = new FormData();
+    const proof = await fileToDataURL(file);
 
-    formData.append("receipt", file);
-    formData.append("amount", selectedAmount);
-    formData.append("days", selectedDays);
-
-    const response = await fetch(
-      "https://scriptpremium.vercel.app/api/validate",
-      {
-        method: "POST",
-        body: formData
-      }
-    );
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        name: "Cliente",
+        code: `PIX-${Date.now()}`,
+        proof: proof
+      })
+    });
 
     const data = await response.json();
 
-    if (data.valid) {
-      msg.innerHTML = `
-        <div class="success">
-          Pagamento confirmado!<br>
-          Acesso liberado até ${data.expires}.
-        </div>
-      `;
-
-      setTimeout(() => {
-        window.location.href = PLATFORM_URL;
-      }, 1500);
-
-    } else {
+    if (!response.ok || !data.success) {
       msg.innerHTML = `
         <div class="error">
-          ${data.error || "Pagamento não confirmado."}
+          ${data.error || "Não foi possível enviar o comprovante."}
         </div>
       `;
 
       sendButton.disabled = false;
+      return;
     }
 
-  } catch (error) {
+    msg.innerHTML = `
+      <div class="success">
+        Comprovante enviado com sucesso!<br>
+        Aguarde a aprovação.
+      </div>
+    `;
 
-    msg
+    sendButton.disabled = true;
+
+  } catch (error) {
+    console.error(error);
+
+    msg.innerHTML = `
+      <div class="error">
+        Erro ao enviar o comprovante.
+      </div>
+    `;
+
+    sendButton.disabled = false;
+  }
+}
