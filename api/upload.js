@@ -1,3 +1,5 @@
+import { sql } from "@vercel/postgres";
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -16,19 +18,26 @@ export default async function handler(req, res) {
       });
     }
 
+    const result = await sql`
+      INSERT INTO comprovantes
+        (nome, codigo, comprovante_url, status)
+      VALUES
+        (${name}, ${code}, ${proof}, 'pendente')
+      RETURNING id, nome, codigo, status, criado_em;
+    `;
+
     return res.status(200).json({
       success: true,
-      message: "Comprovante recebido",
-      data: {
-        name,
-        code,
-        proof
-      }
+      message: "Comprovante registrado",
+      comprovante: result.rows[0]
     });
-  } catch {
+
+  } catch (error) {
+    console.error(error);
+
     return res.status(500).json({
       success: false,
-      error: "Erro interno"
+      error: "Erro ao salvar comprovante"
     });
   }
 }
