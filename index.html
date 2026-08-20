@@ -61,6 +61,8 @@
 
 </main>
 
+<!-- MODAL DE PAGAMENTO -->
+
 <div id="modal" class="modal hidden">
 
   <div class="modalBox">
@@ -69,26 +71,77 @@
       ×
     </button>
 
-    <div class="keyIcon">🔐</div>
+    <div class="keyIcon">💳</div>
 
-    <h2>Acesso protegido</h2>
+    <h2>Acesso Premium</h2>
 
     <p>
-      Digite o código mensal fornecido pelo administrador.
+      Escolha um período e faça o pagamento via Pix.
     </p>
 
-    <input
-      id="code"
-      type="text"
-      placeholder="XXXX-XXXX-XXXX"
-      autocomplete="off"
-    >
+    <div class="plans">
 
-    <button class="validate" onclick="validateCode()">
-      VALIDAR CÓDIGO
-    </button>
+      <button class="plan" onclick="selectPlan(1, 1)">
+        <strong>R$ 1,00</strong>
+        <span>1 dia de acesso</span>
+      </button>
 
-    <div id="message"></div>
+      <button class="plan" onclick="selectPlan(5, 7)">
+        <strong>R$ 5,00</strong>
+        <span>7 dias de acesso</span>
+      </button>
+
+      <button class="plan" onclick="selectPlan(10, 30)">
+        <strong>R$ 10,00</strong>
+        <span>30 dias de acesso</span>
+      </button>
+
+    </div>
+
+    <div id="paymentArea" class="paymentArea hidden">
+
+      <h3>Pagamento via Pix</h3>
+
+      <p id="selectedPlan"></p>
+
+      <div class="pixBox">
+        <strong>Chave Pix</strong>
+        <span>57593231801</span>
+
+        <button onclick="copyPix()">
+          COPIAR CHAVE PIX
+        </button>
+      </div>
+
+      <p class="instruction">
+        Após realizar o pagamento, envie o comprovante abaixo.
+      </p>
+
+      <label class="uploadButton">
+        📷 SELECIONAR COMPROVANTE
+        <input
+          id="receipt"
+          type="file"
+          accept="image/*"
+          onchange="receiptSelected()"
+          hidden
+        >
+      </label>
+
+      <div id="fileName"></div>
+
+      <button
+        id="sendReceipt"
+        class="validate"
+        onclick="sendReceipt()"
+        disabled
+      >
+        ENVIAR COMPROVANTE
+      </button>
+
+      <div id="message"></div>
+
+    </div>
 
   </div>
 
