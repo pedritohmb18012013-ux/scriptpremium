@@ -68,6 +68,30 @@
       color: #f44336;
     }
 
+    .comprovante {
+      margin-top: 10px;
+      padding: 10px;
+      background: #111;
+      border-radius: 10px;
+    }
+
+    .comprovante img {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      max-height: 600px;
+      object-fit: contain;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+
+    .comprovante a {
+      display: inline-block;
+      margin-top: 8px;
+      color: #7eb6ff;
+      font-weight: bold;
+    }
+
     #resultado {
       margin-top: 20px;
     }
@@ -91,6 +115,56 @@
   <div id="resultado"></div>
 
   <script>
+    function mostrarComprovante(url) {
+      if (!url) {
+        return "<p>Nenhum comprovante enviado.</p>";
+      }
+
+      // Imagem em Base64
+      if (url.startsWith("data:image/")) {
+        return `
+          <div class="comprovante">
+            <strong>Comprovante:</strong>
+            <img src="${url}" alt="Comprovante de pagamento">
+          </div>
+        `;
+      }
+
+      // PDF em Base64
+      if (url.startsWith("data:application/pdf")) {
+        return `
+          <div class="comprovante">
+            <strong>Comprovante PDF:</strong><br>
+            <a href="${url}" target="_blank" rel="noopener">
+              📄 Abrir comprovante PDF
+            </a>
+          </div>
+        `;
+      }
+
+      // Caso seja uma URL normal
+      if (
+        url.startsWith("http://") ||
+        url.startsWith("https://")
+      ) {
+        return `
+          <div class="comprovante">
+            <strong>Comprovante:</strong><br>
+            <a href="${url}" target="_blank" rel="noopener">
+              📎 Abrir comprovante
+            </a>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="comprovante">
+          <strong>Comprovante:</strong>
+          <p>Formato não reconhecido.</p>
+        </div>
+      `;
+    }
+
     async function carregar() {
       const key = document.getElementById("adminKey").value;
       const resultado = document.getElementById("resultado");
@@ -112,22 +186,31 @@
         const dados = await resposta.json();
 
         if (!resposta.ok) {
-          resultado.innerHTML = `<p>${dados.error || "Erro"}</p>`;
+          resultado.innerHTML =
+            `<p>${dados.error || "Erro"}</p>`;
           return;
         }
 
         if (!dados.comprovantes.length) {
-          resultado.innerHTML = "<p>Nenhum comprovante encontrado.</p>";
+          resultado.innerHTML =
+            "<p>Nenhum comprovante encontrado.</p>";
           return;
         }
 
         resultado.innerHTML = dados.comprovantes.map(item => `
           <div class="card">
-            <p><strong>ID:</strong> ${item.id}</p>
 
-            <p><strong>Nome:</strong> ${item.nome}</p>
+            <p>
+              <strong>ID:</strong> ${item.id}
+            </p>
 
-            <p><strong>Código:</strong> ${item.codigo}</p>
+            <p>
+              <strong>Nome:</strong> ${item.nome}
+            </p>
+
+            <p>
+              <strong>Código:</strong> ${item.codigo}
+            </p>
 
             <p>
               <strong>Status:</strong>
@@ -136,12 +219,11 @@
               </span>
             </p>
 
-            <p><strong>Data:</strong> ${item.criado_em}</p>
-
             <p>
-              <strong>Comprovante:</strong>
-              ${item.comprovante_url}
+              <strong>Data:</strong> ${item.criado_em}
             </p>
+
+            ${mostrarComprovante(item.comprovante_url)}
 
             ${
               item.status === "pendente"
@@ -162,10 +244,13 @@
                 `
                 : ""
             }
+
           </div>
         `).join("");
 
       } catch (erro) {
+        console.error(erro);
+
         resultado.innerHTML =
           "<p>Erro ao conectar com o servidor.</p>";
       }
@@ -205,7 +290,10 @@
         const dados = await resposta.json();
 
         if (!resposta.ok) {
-          alert(dados.error || "Erro ao alterar status.");
+          alert(
+            dados.error ||
+            "Erro ao alterar status."
+          );
           return;
         }
 
