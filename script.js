@@ -2,6 +2,8 @@ const PLATFORM_URL = "https://platformdestroyer.fun";
 
 let selectedAmount = null;
 let selectedDays = null;
+let requestId = null;
+let statusTimer = null;
 
 function openAccess() {
   document.getElementById("modal").classList.remove("hidden");
@@ -9,6 +11,11 @@ function openAccess() {
 
 function closeAccess() {
   document.getElementById("modal").classList.add("hidden");
+
+  if (statusTimer) {
+    clearInterval(statusTimer);
+    statusTimer = null;
+  }
 
   const paymentArea = document.getElementById("paymentArea");
   const message = document.getElementById("message");
@@ -20,35 +27,26 @@ function closeAccess() {
   message.innerHTML = "";
   fileName.innerHTML = "";
 
-  if (receipt) {
-    receipt.value = "";
-  }
-
-  if (sendButton) {
-    sendButton.disabled = true;
-  }
+  if (receipt) receipt.value = "";
+  if (sendButton) sendButton.disabled = true;
 
   selectedAmount = null;
   selectedDays = null;
+  requestId = null;
 }
 
 function selectPlan(amount, days) {
   selectedAmount = amount;
   selectedDays = days;
 
-  const paymentArea = document.getElementById("paymentArea");
-  const selectedPlan = document.getElementById("selectedPlan");
-  const message = document.getElementById("message");
+  document.getElementById("paymentArea").classList.remove("hidden");
 
-  paymentArea.classList.remove("hidden");
+  document.getElementById("selectedPlan").innerHTML =
+    `Você escolheu <strong>R$ ${amount.toFixed(2).replace(".", ",")}</strong> por <strong>${days} dia${days > 1 ? "s" : ""}</strong>.`;
 
-  selectedPlan.innerHTML =
-    `Você escolheu <strong>R$ ${amount.toFixed(2).replace(".", ",")}</strong> 
-     por <strong>${days} dia${days > 1 ? "s" : ""}</strong>.`;
+  document.getElementById("message").innerHTML = "";
 
-  message.innerHTML = "";
-
-  paymentArea.scrollIntoView({
+  document.getElementById("paymentArea").scrollIntoView({
     behavior: "smooth",
     block: "center"
   });
@@ -63,7 +61,7 @@ async function copyPix() {
     document.getElementById("message").innerHTML =
       '<div class="success">Chave Pix copiada!</div>';
 
-  } catch (error) {
+  } catch {
     document.getElementById("message").innerHTML =
       '<div class="error">Não foi possível copiar. Copie a chave manualmente.</div>';
   }
@@ -82,24 +80,17 @@ function receiptSelected() {
 
   const file = input.files[0];
 
-  const isImage = file.type.startsWith("image/");
-  const isPdf = file.type === "application/pdf";
-
-  if (!isImage && !isPdf) {
+  if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
     sendButton.disabled = true;
-
     fileName.innerHTML =
       '<div class="error">Selecione uma imagem ou PDF.</div>';
-
     return;
   }
 
   if (file.size > 2 * 1024 * 1024) {
     sendButton.disabled = true;
-
     fileName.innerHTML =
       '<div class="error">O arquivo deve ter no máximo 2 MB.</div>';
-
     return;
   }
 
@@ -113,13 +104,9 @@ function fileToDataURL(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = () => {
-      resolve(reader.result);
-    };
-
-    reader.onerror = () => {
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () =>
       reject(new Error("Não foi possível ler o arquivo."));
-    };
 
     reader.readAsDataURL(file);
   });
@@ -133,40 +120,31 @@ async function sendReceipt() {
   if (!selectedAmount || !selectedDays) {
     msg.innerHTML =
       '<div class="error">Escolha um plano primeiro.</div>';
-
     return;
   }
 
   if (!input.files || !input.files[0]) {
     msg.innerHTML =
       '<div class="error">Selecione o comprovante.</div>';
-
     return;
   }
 
   const file = input.files[0];
 
-  const isImage = file.type.startsWith("image/");
-  const isPdf = file.type === "application/pdf";
-
-  if (!isImage && !isPdf) {
+  if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
     msg.innerHTML =
       '<div class="error">Selecione uma imagem ou PDF.</div>';
-
     return;
   }
 
   if (file.size > 2 * 1024 * 1024) {
     msg.innerHTML =
       '<div class="error">O arquivo deve ter no máximo 2 MB.</div>';
-
     return;
   }
 
   sendButton.disabled = true;
-
-  msg.innerHTML =
-    "<div>Enviando comprovante...</div>";
+  msg.innerHTML = "<div>Enviando comprovante...</div>";
 
   try {
     const proof = await fileToDataURL(file);
@@ -186,34 +164,80 @@ async function sendReceipt() {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      msg.innerHTML = `
-        <div class="error">
-          ${data.error || "Não foi possível enviar o comprovante."}
-        </div>
-      `;
+      msg.innerHTML =
+        `<div class="error">${data.error || "Não foi possível enviar o comprovante."}</div>`;
 
       sendButton.disabled = false;
       return;
     }
 
+    requestId = data.comprovante.id;
+
     msg.innerHTML = `
       <div class="success">
         Comprovante enviado com sucesso!<br>
-        Aguarde a aprovação.
+        Aguarde a aprovação...
       </div>
     `;
 
-    sendButton.disabled = true;
+    verificarAprovacao();
 
   } catch (error) {
     console.error(error);
 
-    msg.innerHTML = `
-      <div class="error">
-        Erro ao enviar o comprovante.
-      </div>
-    `;
+    msg.innerHTML =
+      '<div class="error">Erro ao enviar o comprovante.</div>';
 
     sendButton.disabled = false;
   }
+}
+
+function verificarAprovacao() {
+  if (!requestId) return;
+
+  if (statusTimer) {
+    clearInterval(statusTimer);
+  }
+
+  statusTimer = setInterval(async () => {
+    try {
+      const response = await fetch(
+        `/api/status?id=${encodeURIComponent(requestId)}`
+      );
+
+      const data = await response.json();
+
+      if (data.status === "aprovado") {
+        clearInterval(statusTimer);
+        statusTimer = null;
+
+        document.getElementById("message").innerHTML = `
+          <div class="success">
+            Pagamento aprovado!<br>
+            Liberando acesso...
+          </div>
+        `;
+
+        setTimeout(() => {
+          window.location.href = PLATFORM_URL;
+        }, 1000);
+      }
+
+      if (data.status === "rejeitado") {
+        clearInterval(statusTimer);
+        statusTimer = null;
+
+        document.getElementById("message").innerHTML = `
+          <div class="error">
+            O comprovante foi rejeitado.
+          </div>
+        `;
+
+        document.getElementById("sendReceipt").disabled = false;
+      }
+
+    } catch (error) {
+      console.error("Erro ao verificar aprovação:", error);
+    }
+  }, 3000);
 }
