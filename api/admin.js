@@ -1,74 +1,55 @@
-import { neon } from "@neondatabase/serverless";
-
-export default async function handler(req, res) {
-  const adminKey = req.headers["x-admin-key"];
-
-  if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
-    return res.status(401).json({
-      success: false,
-      error: "Não autorizado"
-    });
+function mostrarComprovante(url) {
+  if (!url) {
+    return "<p>Nenhum comprovante enviado.</p>";
   }
 
-  const sql = neon(process.env.DATABASE_URL);
+  if (typeof url === "string" && url.startsWith("data:image/")) {
+    return `
+      <div class="comprovante">
+        <strong>Comprovante:</strong>
+        <br><br>
 
-  try {
-    // LISTAR COMPROVANTES
-    if (req.method === "GET") {
-      const comprovantes = await sql`
-        SELECT id, nome, codigo, comprovante_url, status, criado_em
-        FROM comprovantes
-        ORDER BY criado_em DESC
-      `;
-
-      return res.status(200).json({
-        success: true,
-        comprovantes
-      });
-    }
-
-    // APROVAR OU REJEITAR
-    if (req.method === "PATCH") {
-      const { id, status } = req.body || {};
-
-      if (!id || !["aprovado", "rejeitado"].includes(status)) {
-        return res.status(400).json({
-          success: false,
-          error: "Dados inválidos"
-        });
-      }
-
-      const result = await sql`
-        UPDATE comprovantes
-        SET status = ${status}
-        WHERE id = ${id}
-        RETURNING id, nome, codigo, status
-      `;
-
-      if (result.length === 0) {
-        return res.status(404).json({
-          success: false,
-          error: "Comprovante não encontrado"
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        comprovante: result[0]
-      });
-    }
-
-    return res.status(405).json({
-      success: false,
-      error: "Método não permitido"
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      success: false,
-      error: "Erro interno"
-    });
+        <img
+          src="${url}"
+          alt="Comprovante de pagamento"
+          style="
+            display:block;
+            width:100%;
+            max-width:500px;
+            max-height:600px;
+            object-fit:contain;
+            border-radius:10px;
+            background:#000;
+          "
+        >
+      </div>
+    `;
   }
+
+  if (
+    typeof url === "string" &&
+    url.startsWith("data:application/pdf")
+  ) {
+    return `
+      <div class="comprovante">
+        <strong>Comprovante PDF:</strong>
+        <br><br>
+
+        <a
+          href="${url}"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          📄 Abrir comprovante PDF
+        </a>
+      </div>
+    `;
+  }
+
+  return `
+    <div class="comprovante">
+      <strong>Comprovante:</strong>
+      <p>Formato não reconhecido.</p>
+    </div>
+  `;
 }
