@@ -1,5 +1,3 @@
-index.html
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -47,7 +45,11 @@ index.html
 
     <div class="buttons">
 
-      <button class="primary" onclick="openAccess()">
+      <button
+        class="primary"
+        type="button"
+        onclick="document.getElementById('modal').style.display='grid'"
+      >
         SITE ↗
       </button>
 
@@ -69,7 +71,11 @@ index.html
 
   <div class="modalBox">
 
-    <button class="close" onclick="closeAccess()">
+    <button
+      class="close"
+      type="button"
+      onclick="document.getElementById('modal').style.display='none'"
+    >
       ×
     </button>
 
@@ -83,17 +89,17 @@ index.html
 
     <div class="plans">
 
-      <button class="plan" onclick="selectPlan(1, 1)">
+      <button class="plan" type="button" onclick="selectPlan(1, 1)">
         <strong>R$ 1,00</strong>
         <span>1 dia de acesso</span>
       </button>
 
-      <button class="plan" onclick="selectPlan(5, 7)">
+      <button class="plan" type="button" onclick="selectPlan(5, 7)">
         <strong>R$ 5,00</strong>
         <span>7 dias de acesso</span>
       </button>
 
-      <button class="plan" onclick="selectPlan(10, 30)">
+      <button class="plan" type="button" onclick="selectPlan(10, 30)">
         <strong>R$ 10,00</strong>
         <span>30 dias de acesso</span>
       </button>
@@ -107,12 +113,15 @@ index.html
       <p id="selectedPlan"></p>
 
       <div class="pixBox">
+
         <strong>Chave Pix</strong>
+
         <span>57593231801</span>
 
-        <button onclick="copyPix()">
+        <button type="button" onclick="copyPix()">
           COPIAR CHAVE PIX
         </button>
+
       </div>
 
       <p class="instruction">
@@ -120,7 +129,9 @@ index.html
       </p>
 
       <label class="uploadButton">
+
         📷 SELECIONAR COMPROVANTE
+
         <input
           id="receipt"
           type="file"
@@ -128,6 +139,7 @@ index.html
           onchange="receiptSelected()"
           hidden
         >
+
       </label>
 
       <div id="fileName"></div>
@@ -135,6 +147,7 @@ index.html
       <button
         id="sendReceipt"
         class="validate"
+        type="button"
         onclick="sendReceipt()"
         disabled
       >
@@ -149,7 +162,7 @@ index.html
 
 </div>
 
-<script src="script.js?v=2"></script>
+<script src="script.js?v=4"></script>
 
 </body>
 </html>
