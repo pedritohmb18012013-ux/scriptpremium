@@ -1,9 +1,9 @@
 import { neon } from "@neondatabase/serverless";
 
-async function handler(req, res) {
+export default async function handler(req, res) {
   const adminKey = req.headers["x-admin-key"];
 
-  if (adminKey !== process.env.ADMIN_KEY) {
+  if (!adminKey || adminKey !== process.env.ADMIN_KEY) {
     return res.status(401).json({
       success: false,
       error: "Não autorizado"
@@ -13,6 +13,7 @@ async function handler(req, res) {
   try {
     const sql = neon(process.env.DATABASE_URL);
 
+    // LISTAR COMPROVANTES
     if (req.method === "GET") {
       const comprovantes = await sql`
         SELECT
@@ -32,13 +33,21 @@ async function handler(req, res) {
       });
     }
 
+    // APROVAR OU REJEITAR
     if (req.method === "PATCH") {
       const { id, status } = req.body || {};
 
-      if (!id || !["aprovado", "rejeitado"].includes(status)) {
+      if (!id) {
         return res.status(400).json({
           success: false,
-          error: "Dados inválidos"
+          error: "ID do comprovante não informado"
+        });
+      }
+
+      if (!["aprovado", "rejeitado"].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          error: "Status inválido"
         });
       }
 
@@ -46,7 +55,13 @@ async function handler(req, res) {
         UPDATE comprovantes
         SET status = ${status}
         WHERE id = ${id}
-        RETURNING id, nome, codigo, status
+        RETURNING
+          id,
+          nome,
+          codigo,
+          comprovante_url,
+          status,
+          criado_em
       `;
 
       if (result.length === 0) {
@@ -58,6 +73,10 @@ async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
+        message:
+          status === "aprovado"
+            ? "Comprovante aprovado"
+            : "Comprovante rejeitado",
         comprovante: result[0]
       });
     }
@@ -68,13 +87,11 @@ async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("ADMIN ERROR:", error);
 
     return res.status(500).json({
       success: false,
-      error: "Erro interno"
+      error: "Erro interno no servidor"
     });
   }
 }
-
-export default handler;
