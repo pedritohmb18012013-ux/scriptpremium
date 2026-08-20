@@ -1,58 +1,149 @@
-/*
-  VERSÃO INICIAL.
-  Os códigos ainda serão colocados em um backend seguro da Vercel.
-  NÃO coloque códigos reais aqui, pois este arquivo ficará no GitHub.
-*/
 const PLATFORM_URL = "https://platformdestroyer.fun";
 
-function openAccess(){document.getElementById("modal").classList.remove("hidden");document.getElementById("code").focus()}
-function closeAccess(){document.getElementById("modal").classList.add("hidden");document.getElementById("message").innerHTML=""}
+let selectedAmount = null;
+let selectedDays = null;
 
-/*
-  Por enquanto o formulário está preparado.
-  Na próxima etapa vamos trocar esta função por uma consulta
-  ao backend, onde os códigos mensais ficarão protegidos.
-*/
-async function validateCode(){
-  const msg = document.getElementById("message");
-  const code = document.getElementById("code").value.trim();
+function openAccess() {
+  document.getElementById("modal").classList.remove("hidden");
+}
 
-  if (!code) {
-    msg.innerHTML = '<div class="error">Digite o código de acesso.</div>';
+function closeAccess() {
+  document.getElementById("modal").classList.add("hidden");
+
+  const paymentArea = document.getElementById("paymentArea");
+  const message = document.getElementById("message");
+
+  paymentArea.classList.add("hidden");
+  message.innerHTML = "";
+
+  selectedAmount = null;
+  selectedDays = null;
+}
+
+function selectPlan(amount, days) {
+  selectedAmount = amount;
+  selectedDays = days;
+
+  const paymentArea = document.getElementById("paymentArea");
+  const selectedPlan = document.getElementById("selectedPlan");
+
+  paymentArea.classList.remove("hidden");
+
+  selectedPlan.innerHTML =
+    `Você escolheu <strong>R$ ${amount.toFixed(2).replace(".", ",")}</strong> 
+     por <strong>${days} dia${days > 1 ? "s" : ""}</strong>.`;
+
+  document.getElementById("message").innerHTML = "";
+
+  document.getElementById("paymentArea").scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
+async function copyPix() {
+  const pix = "57593231801";
+
+  try {
+    await navigator.clipboard.writeText(pix);
+
+    document.getElementById("message").innerHTML =
+      '<div class="success">Chave Pix copiada!</div>';
+  } catch (error) {
+    document.getElementById("message").innerHTML =
+      '<div class="error">Não foi possível copiar. Copie a chave manualmente.</div>';
+  }
+}
+
+function receiptSelected() {
+  const input = document.getElementById("receipt");
+  const fileName = document.getElementById("fileName");
+  const sendButton = document.getElementById("sendReceipt");
+
+  if (!input.files || !input.files[0]) {
+    sendButton.disabled = true;
+    fileName.innerHTML = "";
     return;
   }
 
-  msg.innerHTML = '<div>Verificando...</div>';
+  const file = input.files[0];
+
+  if (!file.type.startsWith("image/")) {
+    sendButton.disabled = true;
+    fileName.innerHTML =
+      '<div class="error">Selecione uma imagem.</div>';
+    return;
+  }
+
+  fileName.innerHTML =
+    `<div class="success">Comprovante selecionado: ${file.name}</div>`;
+
+  sendButton.disabled = false;
+}
+
+async function sendReceipt() {
+  const input = document.getElementById("receipt");
+  const msg = document.getElementById("message");
+  const sendButton = document.getElementById("sendReceipt");
+
+  if (!selectedAmount || !selectedDays) {
+    msg.innerHTML =
+      '<div class="error">Escolha um plano primeiro.</div>';
+    return;
+  }
+
+  if (!input.files || !input.files[0]) {
+    msg.innerHTML =
+      '<div class="error">Selecione o comprovante.</div>';
+    return;
+  }
+
+  const file = input.files[0];
+
+  sendButton.disabled = true;
+
+  msg.innerHTML =
+    '<div>Enviando comprovante...</div>';
 
   try {
-    const response = await fetch("https://scriptpremium.vercel.app/api/validate", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ code })
-    });
+    const formData = new FormData();
+
+    formData.append("receipt", file);
+    formData.append("amount", selectedAmount);
+    formData.append("days", selectedDays);
+
+    const response = await fetch(
+      "https://scriptpremium.vercel.app/api/validate",
+      {
+        method: "POST",
+        body: formData
+      }
+    );
 
     const data = await response.json();
 
     if (data.valid) {
       msg.innerHTML = `
         <div class="success">
-          Código válido! Acesso liberado até ${data.expires}.
+          Pagamento confirmado!<br>
+          Acesso liberado até ${data.expires}.
         </div>
       `;
 
-      window.location.href = PLATFORM_URL;
+      setTimeout(() => {
+        window.location.href = PLATFORM_URL;
+      }, 1500);
+
     } else {
       msg.innerHTML = `
-        <div class="error">${data.error || "Código inválido."}</div>
+        <div class="error">
+          ${data.error || "Pagamento não confirmado."}
+        </div>
       `;
+
+      sendButton.disabled = false;
     }
+
   } catch (error) {
-    msg.innerHTML = `
-      <div class="error">
-        Não foi possível conectar ao servidor.
-      </div>
-    `;
-  }
-}
+
+    msg
