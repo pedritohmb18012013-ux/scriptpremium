@@ -35,6 +35,16 @@
       font-weight: bold;
     }
 
+    .aprovar {
+      background: #28a745;
+      color: white;
+    }
+
+    .rejeitar {
+      background: #dc3545;
+      color: white;
+    }
+
     .card {
       background: #1d1d1d;
       border-radius: 12px;
@@ -114,24 +124,101 @@
         resultado.innerHTML = dados.comprovantes.map(item => `
           <div class="card">
             <p><strong>ID:</strong> ${item.id}</p>
+
             <p><strong>Nome:</strong> ${item.nome}</p>
+
             <p><strong>Código:</strong> ${item.codigo}</p>
+
             <p>
               <strong>Status:</strong>
               <span class="status ${item.status}">
                 ${item.status}
               </span>
             </p>
+
             <p><strong>Data:</strong> ${item.criado_em}</p>
+
             <p>
               <strong>Comprovante:</strong>
               ${item.comprovante_url}
             </p>
+
+            ${
+              item.status === "pendente"
+                ? `
+                  <button
+                    class="aprovar"
+                    onclick="alterarStatus(${item.id}, 'aprovado')"
+                  >
+                    Aprovar
+                  </button>
+
+                  <button
+                    class="rejeitar"
+                    onclick="alterarStatus(${item.id}, 'rejeitado')"
+                  >
+                    Rejeitar
+                  </button>
+                `
+                : ""
+            }
           </div>
         `).join("");
 
       } catch (erro) {
-        resultado.innerHTML = "<p>Erro ao conectar com o servidor.</p>";
+        resultado.innerHTML =
+          "<p>Erro ao conectar com o servidor.</p>";
+      }
+    }
+
+    async function alterarStatus(id, status) {
+      const key = document.getElementById("adminKey").value;
+
+      if (!key) {
+        alert("Digite sua chave de administrador.");
+        return;
+      }
+
+      const confirmacao = confirm(
+        status === "aprovado"
+          ? "Deseja realmente APROVAR este comprovante?"
+          : "Deseja realmente REJEITAR este comprovante?"
+      );
+
+      if (!confirmacao) {
+        return;
+      }
+
+      try {
+        const resposta = await fetch("/api/admin", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-key": key
+          },
+          body: JSON.stringify({
+            id: id,
+            status: status
+          })
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+          alert(dados.error || "Erro ao alterar status.");
+          return;
+        }
+
+        alert(
+          status === "aprovado"
+            ? "Comprovante aprovado!"
+            : "Comprovante rejeitado!"
+        );
+
+        carregar();
+
+      } catch (erro) {
+        alert("Erro ao conectar com o servidor.");
       }
     }
   </script>
