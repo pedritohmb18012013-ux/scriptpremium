@@ -8,12 +8,12 @@ export default async function handler(req, res) {
     });
   }
 
-  const id = req.query.id;
+  const id = String(req.query.id || "").trim();
 
-  if (!id) {
+  if (!id || !/^\d+$/.test(id)) {
     return res.status(400).json({
       success: false,
-      error: "ID não informado"
+      error: "ID inválido"
     });
   }
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const result = await sql`
       SELECT id, status
       FROM comprovantes
-      WHERE id = ${id}
+      WHERE id = ${Number(id)}
       LIMIT 1
     `;
 
