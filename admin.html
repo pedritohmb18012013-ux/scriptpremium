@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Administrativo</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      margin: 5px 0;
+    }
+
+    input {
+      width: min(100%, 350px);
+      box-sizing: border-box;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .card {
+      background: #1d1d1d;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 15px;
+    }
+
+    .status {
+      font-weight: bold;
+    }
+
+    .pendente {
+      color: #ffc107;
+    }
+
+    .aprovado {
+      color: #4caf50;
+    }
+
+    .rejeitado {
+      color: #f44336;
+    }
+
+    #resultado {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Painel Administrativo</h1>
+
+  <input
+    type="password"
+    id="adminKey"
+    placeholder="Digite sua chave de administrador"
+  >
+
+  <br>
+
+  <button onclick="carregar()">Carregar comprovantes</button>
+
+  <div id="resultado"></div>
+
+  <script>
+    async function carregar() {
+      const key = document.getElementById("adminKey").value;
+      const resultado = document.getElementById("resultado");
+
+      if (!key) {
+        resultado.innerHTML = "<p>Digite sua chave.</p>";
+        return;
+      }
+
+      resultado.innerHTML = "<p>Carregando...</p>";
+
+      try {
+        const resposta = await fetch("/api/admin", {
+          headers: {
+            "x-admin-key": key
+          }
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+          resultado.innerHTML = `<p>${dados.error || "Erro"}</p>`;
+          return;
+        }
+
+        if (!dados.comprovantes.length) {
+          resultado.innerHTML = "<p>Nenhum comprovante encontrado.</p>";
+          return;
+        }
+
+        resultado.innerHTML = dados.comprovantes.map(item => `
+          <div class="card">
+            <p><strong>ID:</strong> ${item.id}</p>
+            <p><strong>Nome:</strong> ${item.nome}</p>
+            <p><strong>Código:</strong> ${item.codigo}</p>
+            <p>
+              <strong>Status:</strong>
+              <span class="status ${item.status}">
+                ${item.status}
+              </span>
+            </p>
+            <p><strong>Data:</strong> ${item.criado_em}</p>
+            <p>
+              <strong>Comprovante:</strong>
+              ${item.comprovante_url}
+            </p>
+          </div>
+        `).join("");
+
+      } catch (erro) {
+        resultado.innerHTML = "<p>Erro ao conectar com o servidor.</p>";
+      }
+    }
+  </script>
+
+</body>
+</html>
