@@ -1,4 +1,4 @@
-import { sql } from "@vercel/postgres";
+import { neon } from "@neondatabase/serverless";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -18,18 +18,20 @@ export default async function handler(req, res) {
       });
     }
 
+    const sql = neon(process.env.DATABASE_URL);
+
     const result = await sql`
       INSERT INTO comprovantes
         (nome, codigo, comprovante_url, status)
       VALUES
         (${name}, ${code}, ${proof}, 'pendente')
-      RETURNING id, nome, codigo, status, criado_em;
+      RETURNING id, nome, codigo, status, criado_em
     `;
 
     return res.status(200).json({
       success: true,
       message: "Comprovante registrado",
-      comprovante: result.rows[0]
+      comprovante: result[0]
     });
 
   } catch (error) {
