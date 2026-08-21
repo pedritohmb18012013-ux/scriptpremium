@@ -10,10 +10,10 @@ export default async function handler(req, res) {
     });
   }
 
-  try {
-    const sql = neon(process.env.DATABASE_URL);
+  const sql = neon(process.env.DATABASE_URL);
 
-    // LISTAR COMPROVANTES
+  try {
+    // LISTAR
     if (req.method === "GET") {
       const comprovantes = await sql`
         SELECT
@@ -22,7 +22,10 @@ export default async function handler(req, res) {
           codigo,
           comprovante_url,
           status,
-          criado_em
+          criado_em,
+          amount,
+          days,
+          expires_at
         FROM comprovantes
         ORDER BY criado_em DESC
       `;
@@ -37,46 +40,75 @@ export default async function handler(req, res) {
     if (req.method === "PATCH") {
       const { id, status } = req.body || {};
 
-      if (!id) {
+      if (!id || !["aprovado", "rejeitado"].includes(status)) {
         return res.status(400).json({
           success: false,
-          error: "ID do comprovante não informado"
+          error: "Dados inválidos"
         });
       }
 
-      if (!["aprovado", "rejeitado"].includes(status)) {
-        return res.status(400).json({
-          success: false,
-          error: "Status inválido"
+      // REJEITAR
+      if (status === "rejeitado") {
+        const result = await sql`
+          UPDATE comprovantes
+          SET status = 'rejeitado'
+          WHERE id = ${id}
+          RETURNING id, nome, codigo, status
+        `;
+
+        if (result.length === 0) {
+          return res.status(404).json({
+            success: false,
+            error: "Comprovante não encontrado"
+          });
+        }
+
+        return res.status(200).json({
+          success: true,
+          comprovante: result[0]
         });
       }
 
-      const result = await sql`
-        UPDATE comprovantes
-        SET status = ${status}
+      // APROVAR
+      const atual = await sql`
+        SELECT id, days
+        FROM comprovantes
         WHERE id = ${id}
-        RETURNING
-          id,
-          nome,
-          codigo,
-          comprovante_url,
-          status,
-          criado_em
+        LIMIT 1
       `;
 
-      if (result.length === 0) {
+      if (atual.length === 0) {
         return res.status(404).json({
           success: false,
           error: "Comprovante não encontrado"
         });
       }
 
+      const days = Number(atual[0].days);
+
+      if (![1, 7, 30].includes(days)) {
+        return res.status(400).json({
+          success: false,
+          error: "Período de acesso inválido."
+        });
+      }
+
+      const result = await sql`
+        UPDATE comprovantes
+        SET
+          status = 'aprovado',
+          expires_at = NOW() + (${days} * INTERVAL '1 day')
+        WHERE id = ${id}
+        RETURNING
+          id,
+          nome,
+          codigo,
+          status,
+          expires_at
+      `;
+
       return res.status(200).json({
         success: true,
-        message:
-          status === "aprovado"
-            ? "Comprovante aprovado"
-            : "Comprovante rejeitado",
         comprovante: result[0]
       });
     }
@@ -91,7 +123,7 @@ export default async function handler(req, res) {
 
     return res.status(500).json({
       success: false,
-      error: "Erro interno no servidor"
+      error: "Erro interno"
     });
   }
 }
