@@ -1,4 +1,10 @@
 import { neon } from "@neondatabase/serverless";
+import crypto from "crypto";
+
+function gerarCodigo() {
+  const parte = crypto.randomBytes(6).toString("hex").toUpperCase();
+  return `SP-${parte}`;
+}
 
 export default async function handler(req, res) {
   const adminKey = req.headers["x-admin-key"];
@@ -13,6 +19,59 @@ export default async function handler(req, res) {
   const sql = neon(process.env.DATABASE_URL);
 
   try {
+
+    // CRIAR CÓDIGO
+    if (req.method === "POST") {
+      const { nome, days } = req.body || {};
+
+      if (!nome || ![1, 7, 30].includes(Number(days))) {
+        return res.status(400).json({
+          success: false,
+          error: "Nome ou período inválido."
+        });
+      }
+
+      const codigo = gerarCodigo();
+
+      const result = await sql`
+        INSERT INTO comprovantes
+          (
+            nome,
+            codigo,
+            comprovante_url,
+            status,
+            amount,
+            days,
+            access_token,
+            expires_at
+          )
+        VALUES
+          (
+            ${nome},
+            ${codigo},
+            'ADMIN',
+            'aprovado',
+            0,
+            ${Number(days)},
+            ${codigo},
+            NOW() + (${Number(days)} * INTERVAL '1 day')
+          )
+        RETURNING
+          id,
+          nome,
+          codigo,
+          days,
+          expires_at,
+          status
+      `;
+
+      return res.status(201).json({
+        success: true,
+        message: "Código criado com sucesso.",
+        codigo: result[0]
+      });
+    }
+
     // LISTAR
     if (req.method === "GET") {
       const comprovantes = await sql`
@@ -36,7 +95,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // APROVAR OU REJEITAR
+    // APROVAR / REJEITAR
     if (req.method === "PATCH") {
       const { id, status } = req.body || {};
 
@@ -47,7 +106,6 @@ export default async function handler(req, res) {
         });
       }
 
-      // REJEITAR
       if (status === "rejeitado") {
         const result = await sql`
           UPDATE comprovantes
@@ -56,20 +114,12 @@ export default async function handler(req, res) {
           RETURNING id, nome, codigo, status
         `;
 
-        if (result.length === 0) {
-          return res.status(404).json({
-            success: false,
-            error: "Comprovante não encontrado"
-          });
-        }
-
         return res.status(200).json({
           success: true,
           comprovante: result[0]
         });
       }
 
-      // APROVAR
       const atual = await sql`
         SELECT id, days
         FROM comprovantes
@@ -77,7 +127,7 @@ export default async function handler(req, res) {
         LIMIT 1
       `;
 
-      if (atual.length === 0) {
+      if (!atual.length) {
         return res.status(404).json({
           success: false,
           error: "Comprovante não encontrado"
@@ -89,7 +139,7 @@ export default async function handler(req, res) {
       if (![1, 7, 30].includes(days)) {
         return res.status(400).json({
           success: false,
-          error: "Período de acesso inválido."
+          error: "Período inválido."
         });
       }
 
@@ -99,12 +149,7 @@ export default async function handler(req, res) {
           status = 'aprovado',
           expires_at = NOW() + (${days} * INTERVAL '1 day')
         WHERE id = ${id}
-        RETURNING
-          id,
-          nome,
-          codigo,
-          status,
-          expires_at
+        RETURNING id, nome, codigo, status, expires_at
       `;
 
       return res.status(200).json({
