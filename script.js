@@ -1,4 +1,4 @@
-const PLATFORM_URL = "https://platformdestroyer.fun";
+const PLATFORM_URL = "https://zetazerohub.xyz/";
 
 let selectedAmount = null;
 let selectedDays = null;
