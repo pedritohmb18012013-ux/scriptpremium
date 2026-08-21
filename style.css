@@ -366,6 +366,28 @@ main {
   font-weight: bold;
 }
 
+/* WHATSAPP */
+
+.whatsappButton {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: .2s;
+}
+
+.whatsappButton:hover {
+  transform: translateY(-1px);
+  opacity: .9;
+}
+
 footer {
   text-align: center;
   color: #716b82;
