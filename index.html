@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Script Premium — Uso selecionado para a Sala do Futuro</title>
+<title>Script Premium</title>
 <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,10 +14,8 @@
 
 <header>
   <div class="status">
-    <span></span> ACESSO ATIVO
+    <span></span> ACESSO PREMIUM
   </div>
-
-  <div class="menu"></div>
 </header>
 
 <main>
@@ -27,7 +25,7 @@
 
   <div>
     <h1>Script <b>Premium</b></h1>
-    <p>Uso selecionado para Sala do Futuro</p>
+    <p>Área de acesso</p>
   </div>
 </section>
 
@@ -35,23 +33,67 @@
 
   <article class="card">
 
-    <span class="tag">ALL-IN-ONE</span>
+    <span class="tag">ACESSO</span>
 
-    <h2>Platform Destroyer</h2>
+    <h2>Entrar no Premium</h2>
 
     <p>
-      Central de acesso ao Platform Destroyer.
+      Digite o nome cadastrado e o código fornecido pelo administrador.
     </p>
 
-    <div class="buttons">
+    <div style="margin-top:25px;">
+
+      <input
+        id="loginNome"
+        type="text"
+        placeholder="Seu nome"
+        autocomplete="name"
+        style="
+          width:100%;
+          padding:14px;
+          margin-bottom:10px;
+          border-radius:10px;
+          border:1px solid #4b3b72;
+          background:#0f0c20;
+          color:white;
+          box-sizing:border-box;
+        "
+      >
+
+      <input
+        id="loginCodigo"
+        type="text"
+        placeholder="Código de acesso"
+        autocomplete="off"
+        style="
+          width:100%;
+          padding:14px;
+          margin-bottom:10px;
+          border-radius:10px;
+          border:1px solid #4b3b72;
+          background:#0f0c20;
+          color:white;
+          box-sizing:border-box;
+          text-transform:uppercase;
+        "
+      >
 
       <button
         class="primary"
-        type="button"
-        onclick="document.getElementById('modal').style.display='grid'"
+        onclick="entrar()"
+        style="
+          width:100%;
+          padding:14px;
+          border:0;
+          border-radius:10px;
+          font-weight:bold;
+          cursor:pointer;
+        "
       >
-        SITE ↗
+        ENTRAR
       </button>
+
+      <div id="loginMessage"></div>
 
     </div>
 
@@ -65,104 +107,89 @@
 
 </main>
 
-<!-- MODAL DE PAGAMENTO -->
+<script>
 
-<div id="modal" class="modal hidden">
+async function entrar() {
 
-  <div class="modalBox">
+  const nome = document.getElementById("loginNome").value.trim();
+  const codigo = document.getElementById("loginCodigo").value.trim();
+  const message = document.getElementById("loginMessage");
 
-    <button
-      class="close"
-      type="button"
-      onclick="document.getElementById('modal').style.display='none'"
-    >
-      ×
-    </button>
+  if (!nome || !codigo) {
+    message.innerHTML =
+      '<div class="error">Digite seu nome e código.</div>';
+    return;
+  }
 
-    <div class="keyIcon">💳</div>
+  message.innerHTML =
+    '<div>Verificando acesso...</div>';
 
-    <h2>Acesso Premium</h2>
+  try {
 
-    <p>
-      Escolha um período e faça o pagamento via Pix.
-    </p>
+    const response = await fetch("/api/login", {
+      method: "POST",
 
-    <div class="plans">
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-      <button class="plan" type="button" onclick="selectPlan(1, 1)">
-        <strong>R$ 1,00</strong>
-        <span>1 dia de acesso</span>
-      </button>
+      body: JSON.stringify({
+        nome: nome,
+        codigo: codigo
+      })
+    });
 
-      <button class="plan" type="button" onclick="selectPlan(5, 7)">
-        <strong>R$ 5,00</strong>
-        <span>7 dias de acesso</span>
-      </button>
+    const data = await response.json();
 
-      <button class="plan" type="button" onclick="selectPlan(10, 30)">
-        <strong>R$ 10,00</strong>
-        <span>30 dias de acesso</span>
-      </button>
+    if (!response.ok || !data.success) {
 
-    </div>
+      message.innerHTML =
+        `<div class="error">${data.error || "Acesso negado."}</div>`;
 
-    <div id="paymentArea" class="paymentArea hidden">
+      return;
+    }
 
-      <h3>Pagamento via Pix</h3>
+    /*
+      Guarda o código localmente para podermos
+      reconhecer este acesso novamente.
+    */
+    localStorage.setItem(
+      "scriptPremiumNome",
+      nome
+    );
 
-      <p id="selectedPlan"></p>
+    localStorage.setItem(
+      "scriptPremiumCodigo",
+      data.codigo
+    );
 
-      <div class="pixBox">
+    localStorage.setItem(
+      "scriptPremiumExpires",
+      data.expires_at
+    );
 
-        <strong>Chave Pix</strong>
-
-        <span>57593231801</span>
-
-        <button type="button" onclick="copyPix()">
-          COPIAR CHAVE PIX
-        </button>
-
+    message.innerHTML = `
+      <div class="success">
+        Acesso liberado!<br>
+        Expira em:
+        ${new Date(data.expires_at).toLocaleString("pt-BR")}
       </div>
+    `;
 
-      <p class="instruction">
-        Após realizar o pagamento, envie o comprovante abaixo.
-      </p>
+    setTimeout(() => {
+      window.location.href = "https://zetazerohub.xyz/";
+    }, 1000);
 
-      <label class="uploadButton">
+  } catch (error) {
 
-        📷 SELECIONAR COMPROVANTE
+    console.error(error);
 
-        <input
-          id="receipt"
-          type="file"
-          accept="image/*,.pdf"
-          onchange="receiptSelected()"
-          hidden
-        >
+    message.innerHTML =
+      '<div class="error">Erro ao conectar com o servidor.</div>';
+  }
+}
 
-      </label>
-
-      <div id="fileName"></div>
-
-      <button
-        id="sendReceipt"
-        class="validate"
-        type="button"
-        onclick="sendReceipt()"
-        disabled
-      >
-        ENVIAR COMPROVANTE
-      </button>
-
-      <div id="message"></div>
-
-    </div>
-
-  </div>
-
-</div>
-
-<script src="script.js?v=4"></script>
+</script>
 
 </body>
 </html>
