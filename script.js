@@ -7,6 +7,8 @@ let statusTimer = null;
 
 function openAccess() {
   document.getElementById("modal").classList.remove("hidden");
+
+  verificarAcessoSalvo();
 }
 
 function closeAccess() {
@@ -105,6 +107,7 @@ function fileToDataURL(file) {
     const reader = new FileReader();
 
     reader.onload = () => resolve(reader.result);
+
     reader.onerror = () =>
       reject(new Error("Não foi possível ler o arquivo."));
 
@@ -157,7 +160,9 @@ async function sendReceipt() {
       body: JSON.stringify({
         name: "Cliente",
         code: `PIX-${Date.now()}`,
-        proof: proof
+        proof: proof,
+        amount: selectedAmount,
+        days: selectedDays
       })
     });
 
@@ -172,6 +177,18 @@ async function sendReceipt() {
     }
 
     requestId = data.comprovante.id;
+
+    /*
+      O upload.js gera o token de acesso.
+      Salvamos esse token para o navegador lembrar
+      do acesso mesmo depois de fechado.
+    */
+    if (data.comprovante.access_token) {
+      localStorage.setItem(
+        "scriptPremiumAccessToken",
+        data.comprovante.access_token
+      );
+    }
 
     msg.innerHTML = `
       <div class="success">
@@ -211,6 +228,17 @@ function verificarAprovacao() {
         clearInterval(statusTimer);
         statusTimer = null;
 
+        /*
+          Quando aprovado, tenta salvar o token
+          caso ele tenha vindo na resposta.
+        */
+        if (data.access_token) {
+          localStorage.setItem(
+            "scriptPremiumAccessToken",
+            data.access_token
+          );
+        }
+
         document.getElementById("message").innerHTML = `
           <div class="success">
             Pagamento aprovado!<br>
@@ -240,4 +268,34 @@ function verificarAprovacao() {
       console.error("Erro ao verificar aprovação:", error);
     }
   }, 3000);
+}
+
+async function verificarAcessoSalvo() {
+  const token = localStorage.getItem("scriptPremiumAccessToken");
+
+  if (!token) {
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `/api/access?token=${encodeURIComponent(token)}`
+    );
+
+    const data = await response.json();
+
+    if (data.valid) {
+      document.getElementById("message").innerHTML = `
+        <div class="success">
+          Seu acesso está ativo.<br>
+          Expira em: ${new Date(data.expires).toLocaleString("pt-BR")}
+        </div>
+      `;
+    } else {
+      localStorage.removeItem("scriptPremiumAccessToken");
+    }
+
+  } catch (error) {
+    console.error("Erro ao verificar acesso salvo:", error);
+  }
 }
