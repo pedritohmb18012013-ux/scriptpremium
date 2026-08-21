@@ -1,315 +1,398 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Painel Administrativo</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      margin: 0;
-      padding: 20px;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+  margin: 0;
+  padding: 20px;
+}
 
-    h1 {
-      margin-bottom: 20px;
-    }
+h1 {
+  margin-bottom: 20px;
+}
 
-    input, button {
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      margin: 5px 0;
-    }
+input, select, button {
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  margin: 5px 0;
+}
 
-    input {
-      width: min(100%, 350px);
-      box-sizing: border-box;
-    }
+input, select {
+  width: min(100%, 350px);
+  box-sizing: border-box;
+}
 
-    button {
-      cursor: pointer;
-      font-weight: bold;
-    }
+button {
+  cursor: pointer;
+  font-weight: bold;
+}
 
-    .aprovar {
-      background: #28a745;
-      color: white;
-    }
+.criar {
+  background: #6f42c1;
+  color: white;
+}
 
-    .rejeitar {
-      background: #dc3545;
-      color: white;
-    }
+.aprovar {
+  background: #28a745;
+  color: white;
+}
 
-    .card {
-      background: #1d1d1d;
-      border-radius: 12px;
-      padding: 15px;
-      margin-top: 15px;
-    }
+.rejeitar {
+  background: #dc3545;
+  color: white;
+}
 
-    .status {
-      font-weight: bold;
-    }
+.card {
+  background: #1d1d1d;
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 15px;
+}
 
-    .pendente {
-      color: #ffc107;
-    }
+.codigo {
+  background: #080808;
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-family: monospace;
+  font-size: 20px;
+  color: #7cff9b;
+  word-break: break-all;
+}
 
-    .aprovado {
-      color: #4caf50;
-    }
+.status {
+  font-weight: bold;
+}
 
-    .rejeitado {
-      color: #f44336;
-    }
+.pendente {
+  color: #ffc107;
+}
 
-    .comprovante {
-      margin-top: 10px;
-      padding: 10px;
-      background: #111;
-      border-radius: 10px;
-    }
+.aprovado {
+  color: #4caf50;
+}
 
-    .comprovante img {
-      display: block;
-      width: 100%;
-      max-width: 500px;
-      max-height: 600px;
-      object-fit: contain;
-      border-radius: 8px;
-      margin-top: 8px;
-    }
+.rejeitado {
+  color: #f44336;
+}
 
-    .comprovante a {
-      display: inline-block;
-      margin-top: 8px;
-      color: #7eb6ff;
-      font-weight: bold;
-    }
-
-    #resultado {
-      margin-top: 20px;
-    }
-  </style>
+#resultado,
+#codigoCriado {
+  margin-top: 20px;
+}
+</style>
 </head>
 
 <body>
 
-  <h1>Painel Administrativo</h1>
+<h1>Painel Administrativo</h1>
 
-  <input
-    type="password"
-    id="adminKey"
-    placeholder="Digite sua chave de administrador"
-  >
+<input
+  type="password"
+  id="adminKey"
+  placeholder="Chave de administrador"
+>
 
-  <br>
+<hr>
 
-  <button onclick="carregar()">Carregar comprovantes</button>
+<h2>Criar código</h2>
 
-  <div id="resultado"></div>
+<input
+  type="text"
+  id="nome"
+  placeholder="Nome da pessoa"
+>
 
-  <script>
-    function mostrarComprovante(url) {
-      if (!url) {
-        return "<p>Nenhum comprovante enviado.</p>";
-      }
+<br>
 
-      // Imagem em Base64
-      if (url.startsWith("data:image/")) {
-        return `
-          <div class="comprovante">
-            <strong>Comprovante:</strong>
-            <img src="${url}" alt="Comprovante de pagamento">
-          </div>
-        `;
-      }
+<select id="dias">
+  <option value="1">1 dia</option>
+  <option value="7">7 dias</option>
+  <option value="30">30 dias</option>
+</select>
 
-      // PDF em Base64
-      if (url.startsWith("data:application/pdf")) {
-        return `
-          <div class="comprovante">
-            <strong>Comprovante PDF:</strong><br>
-            <a href="${url}" target="_blank" rel="noopener">
-              📄 Abrir comprovante PDF
-            </a>
-          </div>
-        `;
-      }
+<br>
 
-      // Caso seja uma URL normal
-      if (
-        url.startsWith("http://") ||
-        url.startsWith("https://")
-      ) {
-        return `
-          <div class="comprovante">
-            <strong>Comprovante:</strong><br>
-            <a href="${url}" target="_blank" rel="noopener">
-              📎 Abrir comprovante
-            </a>
-          </div>
-        `;
-      }
+<button class="criar" onclick="criarCodigo()">
+  CRIAR CÓDIGO
+</button>
 
-      return `
-        <div class="comprovante">
-          <strong>Comprovante:</strong>
-          <p>Formato não reconhecido.</p>
+<div id="codigoCriado"></div>
+
+<hr>
+
+<h2>Comprovantes</h2>
+
+<button onclick="carregar()">
+  CARREGAR COMPROVANTES
+</button>
+
+<div id="resultado"></div>
+
+<script>
+
+async function criarCodigo() {
+
+  const key = document.getElementById("adminKey").value;
+  const nome = document.getElementById("nome").value.trim();
+  const days = Number(document.getElementById("dias").value);
+  const area = document.getElementById("codigoCriado");
+
+  if (!key) {
+    area.innerHTML = "<p>Digite sua chave de administrador.</p>";
+    return;
+  }
+
+  if (!nome) {
+    area.innerHTML = "<p>Digite o nome da pessoa.</p>";
+    return;
+  }
+
+  area.innerHTML = "<p>Criando código...</p>";
+
+  try {
+
+    const resposta = await fetch("/api/admin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": key
+      },
+      body: JSON.stringify({
+        nome: nome,
+        days: days
+      })
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      area.innerHTML =
+        `<p style="color:#ff5555">${dados.error || "Erro ao criar código."}</p>`;
+      return;
+    }
+
+    area.innerHTML = `
+      <div class="card">
+        <strong>CÓDIGO CRIADO!</strong>
+
+        <div class="codigo">
+          ${dados.codigo.codigo}
         </div>
-      `;
+
+        <p>
+          Nome: ${dados.codigo.nome}<br>
+          Validade: ${dados.codigo.days} dia(s)<br>
+          Expira em: ${dados.codigo.expires_at}
+        </p>
+
+        <button onclick="copiarCodigo('${dados.codigo.codigo}')">
+          COPIAR CÓDIGO
+        </button>
+      </div>
+    `;
+
+    document.getElementById("nome").value = "";
+
+    carregar();
+
+  } catch (erro) {
+
+    area.innerHTML =
+      "<p style='color:#ff5555'>Erro ao conectar com o servidor.</p>";
+  }
+}
+
+
+async function copiarCodigo(codigo) {
+
+  try {
+
+    await navigator.clipboard.writeText(codigo);
+
+    alert("Código copiado!");
+
+  } catch {
+
+    alert("Não foi possível copiar automaticamente.");
+  }
+}
+
+
+async function carregar() {
+
+  const key = document.getElementById("adminKey").value;
+  const resultado = document.getElementById("resultado");
+
+  if (!key) {
+    resultado.innerHTML =
+      "<p>Digite sua chave de administrador.</p>";
+    return;
+  }
+
+  resultado.innerHTML = "<p>Carregando...</p>";
+
+  try {
+
+    const resposta = await fetch("/api/admin", {
+      headers: {
+        "x-admin-key": key
+      }
+    });
+
+    const dados = await resposta.json();
+
+    if (!resposta.ok) {
+      resultado.innerHTML =
+        `<p>${dados.error || "Erro"}</p>`;
+      return;
     }
 
-    async function carregar() {
-      const key = document.getElementById("adminKey").value;
-      const resultado = document.getElementById("resultado");
+    if (!dados.comprovantes.length) {
+      resultado.innerHTML =
+        "<p>Nenhum registro encontrado.</p>";
+      return;
+    }
 
-      if (!key) {
-        resultado.innerHTML = "<p>Digite sua chave.</p>";
-        return;
-      }
+    resultado.innerHTML =
+      dados.comprovantes.map(item => `
 
-      resultado.innerHTML = "<p>Carregando...</p>";
+        <div class="card">
 
-      try {
-        const resposta = await fetch("/api/admin", {
-          headers: {
-            "x-admin-key": key
+          <p>
+            <strong>ID:</strong> ${item.id}
+          </p>
+
+          <p>
+            <strong>Nome:</strong> ${item.nome}
+          </p>
+
+          <p>
+            <strong>Código:</strong> ${item.codigo}
+          </p>
+
+          <p>
+            <strong>Período:</strong>
+            ${item.days || "-"} dia(s)
+          </p>
+
+          <p>
+            <strong>Status:</strong>
+
+            <span class="status ${item.status}">
+              ${item.status}
+            </span>
+          </p>
+
+          <p>
+            <strong>Expira:</strong>
+            ${item.expires_at || "-"}
+          </p>
+
+          ${
+            item.status === "pendente"
+              ? `
+
+                <button
+                  class="aprovar"
+                  onclick="alterarStatus(${item.id}, 'aprovado')"
+                >
+                  APROVAR
+                </button>
+
+                <button
+                  class="rejeitar"
+                  onclick="alterarStatus(${item.id}, 'rejeitado')"
+                >
+                  REJEITAR
+                </button>
+
+              `
+              : ""
           }
-        });
 
-        const dados = await resposta.json();
+        </div>
 
-        if (!resposta.ok) {
-          resultado.innerHTML =
-            `<p>${dados.error || "Erro"}</p>`;
-          return;
-        }
+      `).join("");
 
-        if (!dados.comprovantes.length) {
-          resultado.innerHTML =
-            "<p>Nenhum comprovante encontrado.</p>";
-          return;
-        }
+  } catch {
 
-        resultado.innerHTML = dados.comprovantes.map(item => `
-          <div class="card">
+    resultado.innerHTML =
+      "<p>Erro ao conectar com o servidor.</p>";
+  }
+}
 
-            <p>
-              <strong>ID:</strong> ${item.id}
-            </p>
 
-            <p>
-              <strong>Nome:</strong> ${item.nome}
-            </p>
+async function alterarStatus(id, status) {
 
-            <p>
-              <strong>Código:</strong> ${item.codigo}
-            </p>
+  const key = document.getElementById("adminKey").value;
 
-            <p>
-              <strong>Status:</strong>
-              <span class="status ${item.status}">
-                ${item.status}
-              </span>
-            </p>
+  if (!key) {
+    alert("Digite sua chave de administrador.");
+    return;
+  }
 
-            <p>
-              <strong>Data:</strong> ${item.criado_em}
-            </p>
+  const confirmacao = confirm(
+    status === "aprovado"
+      ? "Deseja APROVAR?"
+      : "Deseja REJEITAR?"
+  );
 
-            ${mostrarComprovante(item.comprovante_url)}
+  if (!confirmacao) return;
 
-            ${
-              item.status === "pendente"
-                ? `
-                  <button
-                    class="aprovar"
-                    onclick="alterarStatus(${item.id}, 'aprovado')"
-                  >
-                    Aprovar
-                  </button>
+  try {
 
-                  <button
-                    class="rejeitar"
-                    onclick="alterarStatus(${item.id}, 'rejeitado')"
-                  >
-                    Rejeitar
-                  </button>
-                `
-                : ""
-            }
+    const resposta = await fetch("/api/admin", {
+      method: "PATCH",
 
-          </div>
-        `).join("");
+      headers: {
+        "Content-Type": "application/json",
+        "x-admin-key": key
+      },
 
-      } catch (erro) {
-        console.error(erro);
+      body: JSON.stringify({
+        id: id,
+        status: status
+      })
+    });
 
-        resultado.innerHTML =
-          "<p>Erro ao conectar com o servidor.</p>";
-      }
-    }
+    const dados = await resposta.json();
 
-    async function alterarStatus(id, status) {
-      const key = document.getElementById("adminKey").value;
+    if (!resposta.ok) {
 
-      if (!key) {
-        alert("Digite sua chave de administrador.");
-        return;
-      }
-
-      const confirmacao = confirm(
-        status === "aprovado"
-          ? "Deseja realmente APROVAR este comprovante?"
-          : "Deseja realmente REJEITAR este comprovante?"
+      alert(
+        dados.error ||
+        "Erro ao alterar status."
       );
 
-      if (!confirmacao) {
-        return;
-      }
-
-      try {
-        const resposta = await fetch("/api/admin", {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-key": key
-          },
-          body: JSON.stringify({
-            id: id,
-            status: status
-          })
-        });
-
-        const dados = await resposta.json();
-
-        if (!resposta.ok) {
-          alert(
-            dados.error ||
-            "Erro ao alterar status."
-          );
-          return;
-        }
-
-        alert(
-          status === "aprovado"
-            ? "Comprovante aprovado!"
-            : "Comprovante rejeitado!"
-        );
-
-        carregar();
-
-      } catch (erro) {
-        alert("Erro ao conectar com o servidor.");
-      }
+      return;
     }
-  </script>
+
+    alert(
+      status === "aprovado"
+        ? "Comprovante aprovado!"
+        : "Comprovante rejeitado!"
+    );
+
+    carregar();
+
+  } catch {
+
+    alert(
+      "Erro ao conectar com o servidor."
+    );
+  }
+}
+
+</script>
 
 </body>
 </html>
