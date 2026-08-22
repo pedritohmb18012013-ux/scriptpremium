@@ -1,4 +1,4 @@
-const PLATFORM_URL = "https://zunder.lat/";
+const PLATFORM_URL = "https://ia-gamma-gray.vercel.app/";
 
 let selectedAmount = null;
 let selectedDays = null;
