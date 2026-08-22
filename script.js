@@ -1,4 +1,4 @@
-const PLATFORM_URL = "https://zetazerohub.xyz/";
+const PLATFORM_URL = "https://zunder.lat/";
 
 let selectedAmount = null;
 let selectedDays = null;
