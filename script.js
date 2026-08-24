@@ -1,4 +1,4 @@
-const PLATFORM_URL = "https://ia-gamma-gray.vercel.app/";
+const PLATFORM_URL = "https://ia-8fx0a0mhw-pedritohmb18012013-uxs-projects.vercel.app";
 
 let selectedAmount = null;
 let selectedDays = null;
