@@ -31,7 +31,45 @@
 
 <section class="cards">
 
+  <!-- ACESSO GRÁTIS À IA -->
+
   <article class="card">
+
+    <span class="tag">GRÁTIS</span>
+
+    <h2>IA Escolar</h2>
+
+    <p>
+      Acesse gratuitamente sua inteligência artificial para estudos.
+    </p>
+
+    <a
+      href="https://ia-gamma-gray.vercel.app/"
+      class="whatsappButton"
+      target="_blank"
+      rel="noopener noreferrer"
+      style="
+        background:#7c35ff;
+        display:block;
+        width:100%;
+        margin-top:20px;
+        padding:14px;
+        color:white;
+        border-radius:10px;
+        font-weight:bold;
+        text-align:center;
+        text-decoration:none;
+        box-sizing:border-box;
+      "
+    >
+      🤖 ACESSO GRÁTIS À IA
+    </a>
+
+  </article>
+
+  <!-- LOGIN PREMIUM -->
+
+  <article class="card" style="margin-top:20px;">
 
     <span class="tag">ACESSO</span>
 
@@ -98,6 +136,8 @@
     </div>
 
   </article>
+
+  <!-- PLANOS -->
 
   <article class="card" style="margin-top:20px;">
 
@@ -200,7 +240,7 @@ async function entrar() {
     );
 
     localStorage.setItem(
-      "SriptPremiumExpires",
+      "ScriptPremiumExpires",
       data.expires_at
     );
 
