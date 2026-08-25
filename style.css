@@ -366,6 +366,29 @@ main {
   font-weight: bold;
 }
 
+/* BOTÃO IA GRÁTIS */
+
+.iaButton {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  background: linear-gradient(135deg, #7c35ff, #b65cff);
+  color: #fff;
+  border-radius: 10px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  transition: .2s;
+  box-shadow: 0 8px 25px rgba(124, 53, 255, .25);
+}
+
+.iaButton:hover {
+  transform: translateY(-2px);
+  opacity: .92;
+}
+
 /* WHATSAPP */
 
 .whatsappButton {
