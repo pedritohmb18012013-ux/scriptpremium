@@ -61,6 +61,12 @@
       transform: translateY(-1px);
     }
 
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .criar {
       background: #6f42c1;
       color: white;
@@ -74,6 +80,11 @@
 
     .rejeitar {
       background: #dc3545;
+      color: white;
+    }
+
+    .copiar {
+      background: #444;
       color: white;
     }
 
@@ -94,6 +105,7 @@
       font-size: 20px;
       color: #7cff9b;
       word-break: break-all;
+      user-select: text;
     }
 
     .status {
@@ -165,7 +177,11 @@
 
   <br>
 
-  <button class="criar" id="btnCriar" onclick="criarCodigo()">
+  <button
+    class="criar"
+    id="btnCriar"
+    onclick="criarCodigo()"
+  >
     CRIAR CÓDIGO
   </button>
 
@@ -181,14 +197,15 @@
 
   <div id="resultado"></div>
 
+
   <script>
 
-    /*
-     * Escapa HTML para impedir que nomes/códigos
-     * vindos da API sejam interpretados como HTML.
-     */
     function escaparHTML(valor) {
-      if (valor === null || valor === undefined) {
+
+      if (
+        valor === null ||
+        valor === undefined
+      ) {
         return "";
       }
 
@@ -201,11 +218,6 @@
     }
 
 
-    /*
-     * Tenta ler a resposta da API como JSON.
-     * Se a API devolver algo que não seja JSON,
-     * evita que o código quebre.
-     */
     async function lerJSON(resposta) {
 
       try {
@@ -216,43 +228,67 @@
     }
 
 
+    // =========================
+    // CRIAR CÓDIGO
+    // =========================
+
     async function criarCodigo() {
 
-      const key = document
-        .getElementById("adminKey")
-        .value
-        .trim();
+      const key =
+        document
+          .getElementById("adminKey")
+          .value
+          .trim();
 
-      const nome = document
-        .getElementById("nome")
-        .value
-        .trim();
+      const nome =
+        document
+          .getElementById("nome")
+          .value
+          .trim();
 
-      const days = Number(
-        document.getElementById("dias").value
-      );
+      const days =
+        Number(
+          document
+            .getElementById("dias")
+            .value
+        );
 
-      const area = document.getElementById("codigoCriado");
-      const botao = document.getElementById("btnCriar");
+      const area =
+        document.getElementById(
+          "codigoCriado"
+        );
+
+      const botao =
+        document.getElementById(
+          "btnCriar"
+        );
 
 
       if (!key) {
+
         area.innerHTML =
           '<p class="erro">Digite sua chave de administrador.</p>';
+
         return;
       }
 
 
       if (!nome) {
+
         area.innerHTML =
           '<p class="erro">Digite o primeiro nome da pessoa.</p>';
+
         return;
       }
 
 
-      if (![1, 7, 15, 30].includes(days)) {
+      if (
+        ![1, 7, 15, 30].includes(days)
+      ) {
+
         area.innerHTML =
           '<p class="erro">Período inválido.</p>';
+
         return;
       }
 
@@ -265,22 +301,30 @@
 
       try {
 
-        const resposta = await fetch("/api/admin", {
-          method: "POST",
+        const resposta =
+          await fetch(
+            "/api/admin",
+            {
+              method: "POST",
 
-          headers: {
-            "Content-Type": "application/json",
-            "x-admin-key": key
-          },
+              headers: {
+                "Content-Type":
+                  "application/json",
 
-          body: JSON.stringify({
-            nome: nome,
-            days: days
-          })
-        });
+                "x-admin-key":
+                  key
+              },
+
+              body: JSON.stringify({
+                nome: nome,
+                days: days
+              })
+            }
+          );
 
 
-        const dados = await lerJSON(resposta);
+        const dados =
+          await lerJSON(resposta);
 
 
         if (!resposta.ok) {
@@ -288,7 +332,8 @@
           area.innerHTML = `
             <p class="erro">
               ${escaparHTML(
-                dados.error || "Erro ao criar código."
+                dados.error ||
+                "Erro ao criar código."
               )}
             </p>
           `;
@@ -297,11 +342,10 @@
         }
 
 
-        /*
-         * Confere se a API realmente retornou
-         * o objeto esperado.
-         */
-        if (!dados.codigo || !dados.codigo.codigo) {
+        if (
+          !dados.codigo ||
+          !dados.codigo.codigo
+        ) {
 
           area.innerHTML = `
             <p class="erro">
@@ -313,64 +357,95 @@
         }
 
 
-        const codigo = escaparHTML(
-          dados.codigo.codigo
-        );
+        const codigoOriginal =
+          String(
+            dados.codigo.codigo
+          );
 
-        const nomeRetornado = escaparHTML(
-          dados.codigo.nome || nome
-        );
 
-        const diasRetornados = escaparHTML(
-          dados.codigo.days || days
-        );
+        const codigo =
+          escaparHTML(
+            codigoOriginal
+          );
 
-        const expira = escaparHTML(
-          dados.codigo.expires_at || "-"
-        );
+        const nomeRetornado =
+          escaparHTML(
+            dados.codigo.nome ||
+            nome
+          );
+
+        const diasRetornados =
+          escaparHTML(
+            dados.codigo.days ||
+            days
+          );
+
+        const expira =
+          escaparHTML(
+            dados.codigo.expires_at ||
+            "-"
+          );
 
 
         area.innerHTML = `
+
           <div class="card">
 
             <strong class="sucesso">
               CÓDIGO CRIADO!
             </strong>
 
-            <div class="codigo">
+            <div
+              class="codigo"
+              id="codigoExibido"
+            >
               ${codigo}
             </div>
 
             <p>
+
               <strong>Nome:</strong>
               ${nomeRetornado}
+
               <br>
 
               <strong>Validade:</strong>
               ${diasRetornados} dia(s)
+
               <br>
 
               <strong>Expira em:</strong>
               ${expira}
+
             </p>
 
+
             <button
-              onclick="copiarCodigo(${JSON.stringify(
-                dados.codigo.codigo
-              )})"
+              class="copiar"
+              onclick="copiarCodigo()"
             >
               COPIAR CÓDIGO
             </button>
 
           </div>
+
         `;
 
 
-        document.getElementById("nome").value = "";
-
         /*
-         * Atualiza a lista de comprovantes.
+         * Guarda o código fora do HTML.
+         * Assim o botão não depende de colocar
+         * o código diretamente dentro do onclick.
          */
+        window.codigoParaCopiar =
+          codigoOriginal;
+
+
+        document
+          .getElementById("nome")
+          .value = "";
+
+
         await carregar();
 
 
@@ -384,41 +459,160 @@
       } finally {
 
         botao.disabled = false;
-
       }
     }
 
 
-    async function copiarCodigo(codigo) {
+    // =========================
+    // COPIAR CÓDIGO
+    // =========================
 
-      try {
+    async function copiarCodigo() {
 
-        await navigator.clipboard.writeText(
-          String(codigo)
+      const codigo =
+        window.codigoParaCopiar;
+
+
+      if (!codigo) {
+
+        alert(
+          "Nenhum código disponível para copiar."
         );
 
-        alert("Código copiado!");
+        return;
+      }
+
+
+      /*
+       * MÉTODO 1:
+       * Clipboard API
+       */
+      try {
+
+        if (
+          navigator.clipboard &&
+          window.isSecureContext
+        ) {
+
+          await navigator.clipboard.writeText(
+            codigo
+          );
+
+          alert(
+            "Código copiado!"
+          );
+
+          return;
+        }
 
       } catch (erro) {
 
-        console.error(erro);
-
-        alert(
-          "Não foi possível copiar automaticamente."
+        console.log(
+          "Clipboard API falhou:",
+          erro
         );
       }
+
+
+      /*
+       * MÉTODO 2:
+       * Compatibilidade com navegadores
+       * de celular.
+       */
+      try {
+
+        const textarea =
+          document.createElement(
+            "textarea"
+          );
+
+        textarea.value = codigo;
+
+        textarea.setAttribute(
+          "readonly",
+          ""
+        );
+
+        textarea.style.position =
+          "fixed";
+
+        textarea.style.left =
+          "-9999px";
+
+        textarea.style.top =
+          "0";
+
+        document.body.appendChild(
+          textarea
+        );
+
+        textarea.focus();
+
+        textarea.select();
+
+        textarea.setSelectionRange(
+          0,
+          textarea.value.length
+        );
+
+
+        const sucesso =
+          document.execCommand(
+            "copy"
+          );
+
+
+        document.body.removeChild(
+          textarea
+        );
+
+
+        if (sucesso) {
+
+          alert(
+            "Código copiado!"
+          );
+
+          return;
+        }
+
+
+      } catch (erro) {
+
+        console.error(
+          "Método alternativo falhou:",
+          erro
+        );
+      }
+
+
+      /*
+       * MÉTODO 3:
+       * Mostra o código para cópia manual.
+       */
+      alert(
+        "A cópia automática foi bloqueada pelo navegador. " +
+        "Selecione o código exibido e copie manualmente."
+      );
     }
 
 
+    // =========================
+    // CARREGAR COMPROVANTES
+    // =========================
+
     async function carregar() {
 
-      const key = document
-        .getElementById("adminKey")
-        .value
-        .trim();
+      const key =
+        document
+          .getElementById("adminKey")
+          .value
+          .trim();
 
       const resultado =
-        document.getElementById("resultado");
+        document.getElementById(
+          "resultado"
+        );
 
 
       if (!key) {
@@ -436,16 +630,22 @@
 
       try {
 
-        const resposta = await fetch("/api/admin", {
-          method: "GET",
+        const resposta =
+          await fetch(
+            "/api/admin",
+            {
+              method: "GET",
 
-          headers: {
-            "x-admin-key": key
-          }
-        });
+              headers: {
+                "x-admin-key":
+                  key
+              }
+            }
+          );
 
 
-        const dados = await lerJSON(resposta);
+        const dados =
+          await lerJSON(resposta);
 
 
         if (!resposta.ok) {
@@ -453,7 +653,8 @@
           resultado.innerHTML = `
             <p class="erro">
               ${escaparHTML(
-                dados.error || "Erro ao carregar."
+                dados.error ||
+                "Erro ao carregar."
               )}
             </p>
           `;
@@ -463,12 +664,16 @@
 
 
         const comprovantes =
-          Array.isArray(dados.comprovantes)
+          Array.isArray(
+            dados.comprovantes
+          )
             ? dados.comprovantes
             : [];
 
 
-        if (!comprovantes.length) {
+        if (
+          !comprovantes.length
+        ) {
 
           resultado.innerHTML =
             "<p>Nenhum registro encontrado.</p>";
@@ -478,96 +683,119 @@
 
 
         resultado.innerHTML =
-          comprovantes.map(item => {
+          comprovantes
+            .map(item => {
 
-            const id =
-              Number(item.id);
+              const id =
+                Number(item.id);
 
-            const nome =
-              escaparHTML(item.nome || "-");
+              const nome =
+                escaparHTML(
+                  item.nome || "-"
+                );
 
-            const codigo =
-              escaparHTML(item.codigo || "-");
+              const codigo =
+                escaparHTML(
+                  item.codigo || "-"
+                );
 
-            const days =
-              escaparHTML(item.days || "-");
+              const days =
+                escaparHTML(
+                  item.days || "-"
+                );
 
-            const status =
-              escaparHTML(item.status || "-");
+              const status =
+                escaparHTML(
+                  item.status || "-"
+                );
 
-            const expires =
-              escaparHTML(item.expires_at || "-");
+              const expires =
+                escaparHTML(
+                  item.expires_at || "-"
+                );
 
 
-            let botoes = "";
+              let botoes = "";
 
 
-            if (item.status === "pendente") {
+              if (
+                item.status ===
+                "pendente"
+              ) {
 
-              botoes = `
+                botoes = `
 
-                <button
-                  class="aprovar"
-                  onclick="alterarStatus(${id}, 'aprovado')"
-                >
-                  APROVAR
-                </button>
+                  <button
+                    class="aprovar"
+                    onclick="alterarStatus(
+                      ${id},
+                      'aprovado'
+                    )"
+                  >
+                    APROVAR
+                  </button>
 
-                <button
-                  class="rejeitar"
-                  onclick="alterarStatus(${id}, 'rejeitado')"
-                >
-                  REJEITAR
-                </button>
+                  <button
+                    class="rejeitar"
+                    onclick="alterarStatus(
+                      ${id},
+                      'rejeitado'
+                    )"
+                  >
+                    REJEITAR
+                  </button>
+
+                `;
+              }
+
+
+              return `
+
+                <div class="card">
+
+                  <p>
+                    <strong>ID:</strong>
+                    ${id}
+                  </p>
+
+                  <p>
+                    <strong>Nome:</strong>
+                    ${nome}
+                  </p>
+
+                  <p>
+                    <strong>Código:</strong>
+                    ${codigo}
+                  </p>
+
+                  <p>
+                    <strong>Período:</strong>
+                    ${days} dia(s)
+                  </p>
+
+                  <p>
+                    <strong>Status:</strong>
+
+                    <span
+                      class="status ${status}"
+                    >
+                      ${status}
+                    </span>
+                  </p>
+
+                  <p>
+                    <strong>Expira:</strong>
+                    ${expires}
+                  </p>
+
+                  ${botoes}
+
+                </div>
 
               `;
-            }
 
-
-            return `
-
-              <div class="card">
-
-                <p>
-                  <strong>ID:</strong>
-                  ${id}
-                </p>
-
-                <p>
-                  <strong>Nome:</strong>
-                  ${nome}
-                </p>
-
-                <p>
-                  <strong>Código:</strong>
-                  ${codigo}
-                </p>
-
-                <p>
-                  <strong>Período:</strong>
-                  ${days} dia(s)
-                </p>
-
-                <p>
-                  <strong>Status:</strong>
-
-                  <span class="status ${status}">
-                    ${status}
-                  </span>
-                </p>
-
-                <p>
-                  <strong>Expira:</strong>
-                  ${expires}
-                </p>
-
-                ${botoes}
-
-              </div>
-
-            `;
-
-          }).join("");
+            })
+            .join("");
 
 
       } catch (erro) {
@@ -576,17 +804,24 @@
 
         resultado.innerHTML =
           '<p class="erro">Erro ao conectar com o servidor.</p>';
-
       }
     }
 
 
-    async function alterarStatus(id, status) {
+    // =========================
+    // ALTERAR STATUS
+    // =========================
 
-      const key = document
-        .getElementById("adminKey")
-        .value
-        .trim();
+    async function alterarStatus(
+      id,
+      status
+    ) {
+
+      const key =
+        document
+          .getElementById("adminKey")
+          .value
+          .trim();
 
 
       if (!key) {
@@ -599,9 +834,15 @@
       }
 
 
-      if (!Number.isInteger(Number(id))) {
+      if (
+        !Number.isInteger(
+          Number(id)
+        )
+      ) {
 
-        alert("ID inválido.");
+        alert(
+          "ID inválido."
+        );
 
         return;
       }
@@ -612,19 +853,22 @@
         status !== "rejeitado"
       ) {
 
-        alert("Status inválido.");
+        alert(
+          "Status inválido."
+        );
 
         return;
       }
 
 
-      const confirmacao = confirm(
+      const confirmacao =
+        confirm(
 
-        status === "aprovado"
-          ? "Deseja APROVAR este comprovante?"
-          : "Deseja REJEITAR este comprovante?"
+          status === "aprovado"
+            ? "Deseja APROVAR este comprovante?"
+            : "Deseja REJEITAR este comprovante?"
 
-      );
+        );
 
 
       if (!confirmacao) {
@@ -634,25 +878,30 @@
 
       try {
 
-        const resposta = await fetch(
-          "/api/admin",
-          {
-            method: "PATCH",
+        const resposta =
+          await fetch(
+            "/api/admin",
+            {
+              method: "PATCH",
 
-            headers: {
-              "Content-Type": "application/json",
-              "x-admin-key": key
-            },
+              headers: {
+                "Content-Type":
+                  "application/json",
 
-            body: JSON.stringify({
-              id: Number(id),
-              status: status
-            })
-          }
-        );
+                "x-admin-key":
+                  key
+              },
+
+              body: JSON.stringify({
+                id: Number(id),
+                status: status
+              })
+            }
+          );
 
 
-        const dados = await lerJSON(resposta);
+        const dados =
+          await lerJSON(resposta);
 
 
         if (!resposta.ok) {
