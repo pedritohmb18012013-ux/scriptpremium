@@ -20,11 +20,14 @@ export default async function handler(req, res) {
 
   try {
 
+    // =========================
     // CRIAR CÓDIGO
+    // =========================
     if (req.method === "POST") {
+
       const { nome, days } = req.body || {};
 
-      if (!nome || ![1, 7, 30].includes(Number(days))) {
+      if (!nome || ![1, 7, 15, 30].includes(Number(days))) {
         return res.status(400).json({
           success: false,
           error: "Nome ou período inválido."
@@ -72,8 +75,12 @@ export default async function handler(req, res) {
       });
     }
 
-    // LISTAR
+
+    // =========================
+    // LISTAR COMPROVANTES
+    // =========================
     if (req.method === "GET") {
+
       const comprovantes = await sql`
         SELECT
           id,
@@ -95,8 +102,12 @@ export default async function handler(req, res) {
       });
     }
 
+
+    // =========================
     // APROVAR / REJEITAR
+    // =========================
     if (req.method === "PATCH") {
+
       const { id, status } = req.body || {};
 
       if (!id || !["aprovado", "rejeitado"].includes(status)) {
@@ -106,12 +117,21 @@ export default async function handler(req, res) {
         });
       }
 
+
+      // -------------------------
+      // REJEITAR
+      // -------------------------
       if (status === "rejeitado") {
+
         const result = await sql`
           UPDATE comprovantes
           SET status = 'rejeitado'
           WHERE id = ${id}
-          RETURNING id, nome, codigo, status
+          RETURNING
+            id,
+            nome,
+            codigo,
+            status
         `;
 
         return res.status(200).json({
@@ -120,12 +140,19 @@ export default async function handler(req, res) {
         });
       }
 
+
+      // -------------------------
+      // APROVAR
+      // -------------------------
       const atual = await sql`
-        SELECT id, days
+        SELECT
+          id,
+          days
         FROM comprovantes
         WHERE id = ${id}
         LIMIT 1
       `;
+
 
       if (!atual.length) {
         return res.status(404).json({
@@ -134,14 +161,18 @@ export default async function handler(req, res) {
         });
       }
 
+
       const days = Number(atual[0].days);
 
-      if (![1, 7, 30].includes(days)) {
+
+      // AGORA ACEITA 1, 7, 15 E 30 DIAS
+      if (![1, 7, 15, 30].includes(days)) {
         return res.status(400).json({
           success: false,
           error: "Período inválido."
         });
       }
+
 
       const result = await sql`
         UPDATE comprovantes
@@ -149,8 +180,14 @@ export default async function handler(req, res) {
           status = 'aprovado',
           expires_at = NOW() + (${days} * INTERVAL '1 day')
         WHERE id = ${id}
-        RETURNING id, nome, codigo, status, expires_at
+        RETURNING
+          id,
+          nome,
+          codigo,
+          status,
+          expires_at
       `;
+
 
       return res.status(200).json({
         success: true,
@@ -158,12 +195,18 @@ export default async function handler(req, res) {
       });
     }
 
+
+    // =========================
+    // MÉTODO NÃO PERMITIDO
+    // =========================
     return res.status(405).json({
       success: false,
       error: "Método não permitido"
     });
 
+
   } catch (error) {
+
     console.error("ADMIN ERROR:", error);
 
     return res.status(500).json({
