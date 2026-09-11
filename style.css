@@ -1,217 +1,474 @@
+/* ================================
+   CONFIGURAÇÕES GERAIS
+================================ */
+
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: #070611;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(124, 53, 255, 0.18), transparent 30%),
+    radial-gradient(circle at 85% 75%, rgba(255, 79, 200, 0.14), transparent 30%),
+    #070611;
   color: #fff;
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
 }
+
+
+/* ================================
+   BRILHOS DO FUNDO
+================================ */
 
 .glow {
   position: fixed;
-  width: 420px;
-  height: 420px;
+  width: 450px;
+  height: 450px;
   border-radius: 50%;
-  filter: blur(120px);
-  opacity: .22;
+  filter: blur(130px);
+  opacity: .25;
   pointer-events: none;
+  z-index: 0;
+  animation: floatingGlow 7s ease-in-out infinite alternate;
 }
 
 .glow1 {
   background: #7c35ff;
-  left: -180px;
-  top: 180px;
+  left: -220px;
+  top: 120px;
 }
 
 .glow2 {
-  background: #ff4fc8;
-  right: -180px;
-  bottom: 50px;
+  background: #ff2fcf;
+  right: -220px;
+  bottom: 20px;
+  animation-delay: 2s;
 }
 
+@keyframes floatingGlow {
+  from {
+    transform: translateY(-20px) scale(1);
+  }
+
+  to {
+    transform: translateY(25px) scale(1.08);
+  }
+}
+
+
+/* ================================
+   CABEÇALHO
+================================ */
+
 header {
-  height: 70px;
-  border-bottom: 1px solid #19152b;
+  height: 72px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0 7%;
   position: relative;
   z-index: 2;
+  background: rgba(7, 6, 17, .65);
+  backdrop-filter: blur(15px);
 }
 
 .status {
-  font: 11px monospace;
-  letter-spacing: 2px;
-  color: #e08cff;
+  font-size: 11px;
+  font-family: monospace;
+  letter-spacing: 3px;
+  color: #e18cff;
+  text-shadow: 0 0 12px rgba(225, 140, 255, .5);
 }
 
 .status span {
   display: inline-block;
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   background: #ed5cff;
   border-radius: 50%;
-  margin-right: 8px;
-  box-shadow: 0 0 12px #ed5cff;
+  margin-right: 9px;
+  box-shadow:
+    0 0 8px #ed5cff,
+    0 0 20px #ed5cff;
+  animation: pulse 1.5s infinite;
 }
 
-.menu {
-  font-size: 24px;
-  color: #aaa3bc;
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: .45;
+    transform: scale(.75);
+  }
 }
+
+
+/* ================================
+   CONTEÚDO
+================================ */
 
 main {
+  position: relative;
+  z-index: 1;
   max-width: 1050px;
   margin: auto;
-  padding: 65px 24px;
+  padding: 75px 24px 30px;
 }
+
+
+/* ================================
+   HERO / TÍTULO
+================================ */
 
 .hero {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 18px;
-  margin-bottom: 55px;
+  gap: 20px;
+  margin-bottom: 65px;
+  animation: heroAppear .8s ease-out;
+}
+
+@keyframes heroAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+
   display: grid;
   place-items: center;
-  background: linear-gradient(145deg, #8051ff, #ef72cf);
-  font-size: 34px;
+
+  background:
+    linear-gradient(145deg, #7c35ff, #ff54cf);
+
+  font-size: 38px;
+
+  box-shadow:
+    0 0 20px rgba(124, 53, 255, .45),
+    0 0 55px rgba(255, 84, 207, .2);
+
+  animation: logoFloat 3s ease-in-out infinite;
+}
+
+@keyframes logoFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
 }
 
 .hero h1 {
   margin: 0;
-  font-size: 56px;
-  letter-spacing: -3px;
-  color: #ffd700;
+  font-size: clamp(40px, 7vw, 68px);
+  letter-spacing: -4px;
+
+  background: linear-gradient(
+    90deg,
+    #ffffff,
+    #c994ff,
+    #ff61d5,
+    #ffffff
+  );
+
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  animation: titleShine 4s linear infinite;
+}
+
+@keyframes titleShine {
+  to {
+    background-position: 250% center;
+  }
+}
+
+.hero h1 b {
+  color: inherit;
 }
 
 .hero p {
-  margin: 10px 0;
+  margin: 8px 0 0;
   color: #aaa3bc;
   font-family: monospace;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: minmax(280px, 380px);
-  justify-content: center;
-}
-
-.card {
-  min-height: 255px;
-  padding: 22px;
-  border: 1px solid #3c2878;
-  border-radius: 18px;
-  background: linear-gradient(145deg, #241b5b, #151236);
-  box-shadow: 0 20px 60px #0007;
-}
-
-.tag {
-  float: right;
-  font-size: 9px;
-  background: #6040a8;
-  padding: 6px 8px;
-  border-radius: 5px;
   letter-spacing: 1px;
 }
 
+
+/* ================================
+   CARDS
+================================ */
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 22px;
+  max-width: 850px;
+  margin: auto;
+}
+
+.card {
+  position: relative;
+  min-height: 255px;
+  padding: 27px;
+
+  border: 1px solid rgba(142, 87, 255, .45);
+  border-radius: 22px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(40, 27, 94, .92),
+      rgba(17, 13, 43, .94)
+    );
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.05);
+
+  backdrop-filter: blur(15px);
+
+  overflow: hidden;
+
+  transition:
+    transform .3s ease,
+    border-color .3s ease,
+    box-shadow .3s ease;
+
+  animation: cardAppear .7s ease both;
+}
+
+.card:nth-child(2) {
+  animation-delay: .12s;
+}
+
+.card:nth-child(3) {
+  animation-delay: .24s;
+}
+
+@keyframes cardAppear {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  top: -100px;
+  right: -70px;
+
+  background: #9d5cff;
+  filter: blur(80px);
+  opacity: .15;
+
+  pointer-events: none;
+}
+
+.card:hover {
+  transform: translateY(-7px);
+
+  border-color: rgba(177, 111, 255, .8);
+
+  box-shadow:
+    0 25px 70px rgba(0,0,0,.55),
+    0 0 35px rgba(124,53,255,.12);
+}
+
 .card h2 {
-  padding-top: 30px;
-  margin-bottom: 10px;
+  position: relative;
+  margin: 30px 0 12px;
+  font-size: 24px;
 }
 
 .card p {
+  position: relative;
   color: #bbb4cb;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.65;
 }
 
-.buttons {
-  display: flex;
-  gap: 9px;
-  margin-top: 55px;
-}
 
-.buttons button,
-.validate {
-  flex: 1;
-  border: 1px solid #6454a5;
-  border-radius: 10px;
-  padding: 12px;
-  background: #1b1740;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-}
+/* ================================
+   ETIQUETAS
+================================ */
 
-.buttons .primary {
-  background: #fff;
-  color: #181224;
-}
-
-/* MODAL */
-
-.modal {
-  position: fixed;
-  inset: 0;
-  background: #000b;
-  display: grid;
-  place-items: center;
-  padding: 20px;
-  z-index: 5;
-  overflow-y: auto;
-}
-
-.hidden {
-  display: none;
-}
-
-.modalBox {
+.tag {
   position: relative;
-  width: min(420px, 100%);
-  max-height: 90vh;
-  overflow-y: auto;
-  padding: 30px;
-  border: 1px solid #6643a0;
-  border-radius: 20px;
-  background: #15112b;
-  box-shadow: 0 25px 100px #000;
+  float: right;
+
+  font-size: 9px;
+  font-weight: bold;
+
+  background:
+    linear-gradient(135deg, #7040c8, #a457ff);
+
+  padding: 7px 10px;
+  border-radius: 7px;
+
+  letter-spacing: 1.5px;
+
+  box-shadow:
+    0 5px 18px rgba(124,53,255,.3);
 }
 
-.close {
-  position: absolute;
-  right: 14px;
-  top: 8px;
+
+/* ================================
+   BOTÕES
+================================ */
+
+.whatsappButton,
+.iaButton {
+  position: relative;
+
+  display: block;
+  width: 100%;
+
+  margin-top: 18px;
+  padding: 15px;
+
   border: 0;
-  background: none;
-  color: #aaa;
-  font-size: 28px;
+  border-radius: 12px;
+
+  color: white;
+  text-align: center;
+  text-decoration: none;
+
+  font-weight: bold;
+  font-size: 14px;
+
   cursor: pointer;
+
+  overflow: hidden;
+
+  transition:
+    transform .25s ease,
+    box-shadow .25s ease,
+    filter .25s ease;
 }
 
-.keyIcon {
-  font-size: 32px;
+
+/* brilho passando pelo botão */
+
+.whatsappButton::before,
+.iaButton::before {
+  content: "";
+
+  position: absolute;
+  top: 0;
+  left: -120%;
+
+  width: 70%;
+  height: 100%;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.25),
+    transparent
+  );
+
+  transform: skewX(-20deg);
+
+  transition: left .6s ease;
 }
 
-.modalBox h2 {
-  margin: 10px 0;
+.whatsappButton:hover::before,
+.iaButton:hover::before {
+  left: 140%;
 }
 
-.modalBox p {
-  color: #bbb4cb;
+.whatsappButton:hover,
+.iaButton:hover {
+  transform: translateY(-3px) scale(1.01);
+  filter: brightness(1.1);
 }
 
-/* PLANOS */
+
+/* IA */
+
+.iaButton {
+  background: linear-gradient(
+    135deg,
+    #702cff,
+    #b04dff,
+    #e05bff
+  );
+
+  box-shadow:
+    0 10px 30px rgba(124,53,255,.35);
+}
+
+
+/* WhatsApp */
+
+.whatsappButton {
+  background: linear-gradient(
+    135deg,
+    #7c35ff,
+    #a94cff,
+    #d75bff
+  );
+
+  box-shadow:
+    0 10px 30px rgba(124,53,255,.28);
+}
+
+
+/* ================================
+   SEÇÃO DE COLABORAÇÃO
+================================ */
+
+.card:last-child {
+  grid-column: 1 / -1;
+}
+
+.card:last-child h2 {
+  font-size: 27px;
+}
+
+.card:last-child p {
+  max-width: 650px;
+}
+
+
+/* ================================
+   PLANOS / PREÇOS
+================================ */
 
 .plans {
   display: flex;
@@ -223,18 +480,25 @@ main {
 .plan {
   width: 100%;
   padding: 15px;
+
   border: 1px solid #4b3b72;
   border-radius: 12px;
-  background: #0f0c20;
+
+  background: rgba(15, 12, 32, .8);
   color: white;
+
   cursor: pointer;
   text-align: left;
-  transition: .2s;
+
+  transition: .25s;
 }
 
 .plan:hover {
   border-color: #a66cff;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 8px 25px rgba(124,53,255,.15);
 }
 
 .plan strong {
@@ -249,195 +513,131 @@ main {
   font-size: 13px;
 }
 
-/* ÁREA DE PAGAMENTO */
 
-.paymentArea {
-  margin-top: 22px;
-  padding-top: 20px;
-  border-top: 1px solid #30264b;
+/* ================================
+   EFEITO NOS BOTÕES DE ATIVIDADES
+================================ */
+
+.card:last-child .whatsappButton {
+  background:
+    linear-gradient(
+      135deg,
+      #702cff,
+      #9e45ff,
+      #d65bff
+    );
 }
 
-.paymentArea h3 {
-  margin-top: 0;
+.card:last-child .whatsappButton:hover {
+  box-shadow:
+    0 12px 35px rgba(142,65,255,.35);
 }
 
-.pixBox {
-  margin: 15px 0;
-  padding: 16px;
-  border: 1px solid #4b3b72;
-  border-radius: 12px;
-  background: #0b0917;
-  text-align: center;
-}
 
-.pixBox strong {
-  display: block;
-  color: #aaa3bc;
-  font-size: 12px;
-  margin-bottom: 8px;
-}
-
-.pixBox span {
-  display: block;
-  font-family: monospace;
-  font-size: 17px;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  word-break: break-all;
-}
-
-.pixBox button {
-  width: 100%;
-  padding: 11px;
-  border: 0;
-  border-radius: 9px;
-  background: #6040a8;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.instruction {
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-/* UPLOAD */
-
-.uploadButton {
-  display: block;
-  width: 100%;
-  padding: 14px;
-  margin-top: 15px;
-  border: 1px dashed #7555ae;
-  border-radius: 10px;
-  background: #0e0b1d;
-  color: white;
-  text-align: center;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.uploadButton:hover {
-  background: #18132e;
-}
-
-#fileName {
-  font-size: 12px;
-  word-break: break-word;
-}
-
-/* BOTÃO ENVIAR */
-
-.validate {
-  width: 100%;
-  margin-top: 12px;
-  background: #f1a0e0;
-  color: #25182c;
-  border: 0;
-}
-
-.validate:disabled {
-  opacity: .45;
-  cursor: not-allowed;
-}
-
-/* MENSAGENS */
-
-.success {
-  margin-top: 14px;
-  color: #76e7a8;
-}
-
-.error {
-  margin-top: 14px;
-  color: #ff819f;
-}
-
-.enter {
-  display: block;
-  text-decoration: none;
-  text-align: center;
-  margin-top: 12px;
-  padding: 13px;
-  background: #fff;
-  color: #181224;
-  border-radius: 10px;
-  font-weight: bold;
-}
-
-/* BOTÃO IA GRÁTIS */
-
-.iaButton {
-  display: block;
-  width: 100%;
-  margin-top: 12px;
-  padding: 14px;
-  background: linear-gradient(135deg, #7c35ff, #b65cff);
-  color: #fff;
-  border-radius: 10px;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  box-sizing: border-box;
-  transition: .2s;
-  box-shadow: 0 8px 25px rgba(124, 53, 255, .25);
-}
-
-.iaButton:hover {
-  transform: translateY(-2px);
-  opacity: .92;
-}
-
-/* WHATSAPP */
-
-.whatsappButton {
-  display: block;
-  width: 100%;
-  margin-top: 12px;
-  padding: 13px;
-  background: #25d366;
-  color: #fff;
-  border-radius: 10px;
-  font-weight: bold;
-  text-align: center;
-  text-decoration: none;
-  box-sizing: border-box;
-  transition: .2s;
-}
-
-.whatsappButton:hover {
-  transform: translateY(-1px);
-  opacity: .9;
-}
+/* ================================
+   RODAPÉ
+================================ */
 
 footer {
   text-align: center;
   color: #716b82;
   font-size: 11px;
-  padding: 45px 0;
+  padding: 65px 0 30px;
+  position: relative;
 }
 
-@media (max-width: 550px) {
+footer::before {
+  content: "";
+  display: block;
+  width: 100px;
+  height: 1px;
+  margin: 0 auto 20px;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #8c4dff,
+    transparent
+  );
+}
+
+
+/* ================================
+   RESPONSIVIDADE
+================================ */
+
+@media (max-width: 700px) {
+
   main {
-    padding: 45px 16px;
+    padding: 50px 16px 20px;
+  }
+
+  .hero {
+    margin-bottom: 45px;
   }
 
   .hero h1 {
-    font-size: 40px;
+    font-size: 42px;
+    letter-spacing: -2px;
+  }
+
+  .logo {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    font-size: 30px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+  }
+
+  .card:last-child {
+    grid-column: auto;
+  }
+
+  .card {
+    padding: 23px;
+  }
+}
+
+
+@media (max-width: 430px) {
+
+  header {
+    height: 62px;
+  }
+
+  .status {
+    font-size: 9px;
+    letter-spacing: 2px;
   }
 
   .hero {
     gap: 12px;
   }
 
-  .logo {
-    width: 55px;
-    height: 55px;
-    font-size: 28px;
+  .hero h1 {
+    font-size: 34px;
   }
 
-  .modalBox {
-    padding: 24px;
+  .hero p {
+    font-size: 11px;
+  }
+
+  .logo {
+    width: 52px;
+    height: 52px;
+    font-size: 27px;
+  }
+
+  .card {
+    border-radius: 18px;
+    padding: 20px;
+  }
+
+  .card h2 {
+    font-size: 21px;
   }
 }
