@@ -14,7 +14,7 @@
 
 <header>
   <div class="status">
-    <span></span> ACESSO PREMIUM
+    <span></span> ACESSO GRATUITO
   </div>
 </header>
 
@@ -25,13 +25,13 @@
 
   <div>
     <h1>Script <b>Premium</b></h1>
-    <p>Área de acesso</p>
+    <p>Acesso gratuito</p>
   </div>
 </section>
 
 <section class="cards">
 
-  <!-- ACESSO GRÁTIS À IA -->
+  <!-- IA ESCOLAR -->
 
   <article class="card">
 
@@ -62,124 +62,44 @@
         box-sizing:border-box;
       "
     >
-      🤖 ACESSO GRÁTIS À IA
+      🤖 ACESSAR IA GRÁTIS
     </a>
 
   </article>
 
-  <!-- LOGIN PREMIUM -->
+
+  <!-- ACESSO GRATUITO -->
 
   <article class="card" style="margin-top:20px;">
 
-    <span class="tag">ACESSO</span>
+    <span class="tag">GRÁTIS</span>
 
-    <h2>Entrar no Script Premium</h2>
-
-    <p>
-      Digite o nome cadastrado e o código fornecido pelo administrador.
-    </p>
-
-    <div style="margin-top:25px;">
-
-      <input
-        id="loginNome"
-        type="text"
-        placeholder="Seu primeiro nome"
-        autocomplete="name"
-        style="
-          width:100%;
-          padding:14px;
-          margin-bottom:10px;
-          border-radius:10px;
-          border:1px solid #4b3b72;
-          background:#0f0c20;
-          color:white;
-          box-sizing:border-box;
-        "
-      >
-
-      <input
-        id="loginCodigo"
-        type="text"
-        placeholder="Código de acesso"
-        autocomplete="off"
-        style="
-          width:100%;
-          padding:14px;
-          margin-bottom:10px;
-          border-radius:10px;
-          border:1px solid #4b3b72;
-          background:#0f0c20;
-          color:white;
-          box-sizing:border-box;
-          text-transform:uppercase;
-        "
-      >
-
-      <button
-        class="primary"
-        onclick="entrar()"
-        style="
-          width:100%;
-          padding:14px;
-          border:0;
-          border-radius:10px;
-          font-weight:bold;
-          cursor:pointer;
-        "
-      >
-        ENTRAR
-      </button>
-
-      <div id="loginMessage"></div>
-
-    </div>
-
-  </article>
-
-  <!-- PLANOS -->
-
-  <article class="card" style="margin-top:20px;">
-
-    <span class="tag">COMPRAR</span>
-
-    <h2>Planos de acesso</h2>
+    <h2>Acessar Script Premium</h2>
 
     <p>
-      Escolha seu período e fale comigo pelo WhatsApp para realizar a compra.
+      Clique no botão abaixo para acessar o site gratuitamente.
     </p>
-
-    <div class="plans">
-
-      <div class="plan">
-        <strong>R$ 0,50 — 1 dia</strong>
-        <span>Acesso por 24 horas</span>
-      </div>
-
-      <div class="plan">
-        <strong>R$ 5,00 — 7 dias</strong>
-        <span>Acesso por 7 dias</span>
-      </div>
-
-      <div class="plan">
-        <strong>R$ 7,50 — 15 dias</strong>
-        <span>Acesso por 15 dias</span>
-      </div>
-
-      <div class="plan">
-        <strong>R$ 10,00 — 30 dias</strong>
-        <span>Acesso por 30 dias</span>
-      </div>
-
-    </div>
 
     <a
-      href="https://wa.me/5512988428460?text=Olá!%20Quero%20comprar%20um%20acesso%20do%20Script%20Premium."
+      href="https://salvaestudante.com/"
       target="_blank"
       rel="noopener noreferrer"
       class="whatsappButton"
+      style="
+        background:#7c35ff;
+        display:block;
+        width:100%;
+        margin-top:20px;
+        padding:14px;
+        color:white;
+        border-radius:10px;
+        font-weight:bold;
+        text-align:center;
+        text-decoration:none;
+        box-sizing:border-box;
+      "
     >
-      FALAR NO WHATSAPP
+      🚀 ACESSAR AGORA
     </a>
 
   </article>
@@ -191,86 +111,6 @@
 </footer>
 
 </main>
-
-<script>
-
-async function entrar() {
-
-  const nome = document.getElementById("loginNome").value.trim();
-  const codigo = document.getElementById("loginCodigo").value.trim();
-  const message = document.getElementById("loginMessage");
-
-  if (!nome || !codigo) {
-    message.innerHTML =
-      '<div class="error">Digite o nome e o código.</div>';
-    return;
-  }
-
-  message.innerHTML =
-    '<div>Verificando acesso...</div>';
-
-  try {
-
-    const response = await fetch("/api/login", {
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        nome: nome,
-        codigo: codigo
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.success) {
-
-      message.innerHTML =
-        `<div class="error">${data.error || "Acesso negado."}</div>`;
-
-      return;
-    }
-
-    localStorage.setItem(
-      "ScriptPremiumNome",
-      nome
-    );
-
-    localStorage.setItem(
-      "ScriptPremiumCodigo",
-      data.codigo
-    );
-
-    localStorage.setItem(
-      "ScriptPremiumExpires",
-      data.expires_at
-    );
-
-    message.innerHTML = `
-      <div class="success">
-        Acesso liberado!<br>
-        Expira em:
-        ${new Date(data.expires_at).toLocaleString("pt-BR")}
-      </div>
-    `;
-
-    setTimeout(() => {
-      window.location.href = "https://salvaestudante.com/";
-    }, 1000);
-
-  } catch (error) {
-
-    console.error(error);
-
-    message.innerHTML =
-      '<div class="error">Erro ao conectar com o servidor.</div>';
-  }
-}
-
-</script>
 
 </body>
 </html>
