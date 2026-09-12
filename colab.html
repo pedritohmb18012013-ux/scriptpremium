@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Colab — Script Premium</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="glow glow1"></div>
+<div class="glow glow2"></div>
+
+<header>
+  <div class="status">
+    <a href="index.html" style="color:white;text-decoration:none;">← Voltar</a>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div>
+    <h1>Google <b>Colab</b></h1>
+    <p>Escolha a quantidade de atividades</p>
+  </div>
+</section>
+
+<section class="cards">
+  <article class="card" style="margin-top:10px;">
+    <h2 style="text-align:center;">Selecione a quantidade</h2>
+
+    <div id="opcoes" style="margin-top:20px;display:flex;flex-direction:column;gap:12px;">
+
+      <button class="whatsappButton opcao" data-qtd="1" data-preco="2.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654042.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220984105556304BAB4" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+        📝 1 atividade — R$ 2,50
+      </button>
+
+      <button class="whatsappButton opcao" data-qtd="2" data-preco="4.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654044.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220985113116304FAEC" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+        📝 2 atividades — R$ 4,50
+      </button>
+
+      <button class="whatsappButton opcao" data-qtd="3" data-preco="6.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654046.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr190792209857366763049E7A" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+        📝 3 atividades — R$ 6,50
+      </button>
+
+      <button class="whatsappButton opcao" data-qtd="4" data-preco="8.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654048.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr190792209863444163041327" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+        📝 4 atividades — R$ 8,50
+      </button>
+
+      <button class="whatsappButton opcao" data-qtd="5" data-preco="10.00" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654049.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220986902836304F36A" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+        📝 5 atividades — R$ 10,00
+      </button>
+
+    </div>
+
+    <!-- ÁREA DO PIX (inicialmente oculta) -->
+    <div id="areaPix" style="display:none;margin-top:24px;text-align:center;">
+      <h3 style="color:#7c35ff;margin-bottom:8px;">💰 Pague via PIX</h3>
+      <p id="valorPix" style="font-size:1.4rem;font-weight:bold;color:white;"></p>
+      <p style="color:#aaa;font-size:0.9rem;margin-bottom:12px;">Copie o código abaixo e cole no app do seu banco</p>
+      <textarea id="codigoPix" readonly rows="4" style="width:100%;padding:12px;border-radius:10px;border:1px solid #7c35ff;background:#1a1a2e;color:white;font-size:0.75rem;resize:none;box-sizing:border-box;"></textarea>
+      <button id="btnCopiar" style="background:#7c35ff;color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;font-size:1rem;cursor:pointer;margin-top:12px;width:100%;box-sizing:border-box;">
+        📋 Copiar código PIX
+      </button>
+      <p id="msgCopiado" style="color:#4caf50;margin-top:10px;display:none;">✅ Código copiado! Cole no app do banco.</p>
+    </div>
+
+  </article>
+</section>
+
+<footer>
+  © 2026 Script Premium
+</footer>
+
+</main>
+
+<script>
+const botoes = document.querySelectorAll('.opcao');
+const areaPix = document.getElementById('areaPix');
+const valorPix = document.getElementById('valorPix');
+const codigoPix = document.getElementById('codigoPix');
+const btnCopiar = document.getElementById('btnCopiar');
+const msgCopiado = document.getElementById('msgCopiado');
+
+botoes.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const preco = btn.dataset.preco;
+    const pix = btn.dataset.pix;
+    const qtd = btn.dataset.qtd;
+
+    valorPix.textContent = `Total: R$ ${preco.replace('.', ',')}`;
+    codigoPix.value = pix;
+    areaPix.style.display = 'block';
+    msgCopiado.style.display = 'none';
+
+    // Scroll suave até o PIX
+    areaPix.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+
+btnCopiar.addEventListener('click', () => {
+  codigoPix.select();
+  codigoPix.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(codigoPix.value).then(() => {
+    msgCopiado.style.display = 'block';
+    btnCopiar.textContent = '✅ Copiado!';
+    setTimeout(() => {
+      btnCopiar.textContent = '📋 Copiar código PIX';
+    }, 3000);
+  }).catch(() => {
+    // Fallback para navegadores antigos
+    document.execCommand('copy');
+    msgCopiado.style.display = 'block';
+  });
+});
+</script>
+
+</body>
+</html>   
