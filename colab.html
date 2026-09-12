@@ -13,9 +13,7 @@
 <div class="glow glow2"></div>
 
 <header>
-  <div class="status">
-    <a href="index.html" style="color:white;text-decoration:none;">← Voltar</a>
-  </div>
+  <a href="index.html" style="color:white;text-decoration:none;font-weight:bold;padding:10px 16px;display:inline-block;">← Voltar</a>
 </header>
 
 <main>
@@ -23,51 +21,104 @@
 <section class="hero">
   <div>
     <h1>Google <b>Colab</b></h1>
-    <p>Escolha a quantidade de atividades</p>
+    <p>Preencha seus dados para solicitar o serviço</p>
   </div>
 </section>
 
 <section class="cards">
+
+  <!-- FORMULÁRIO DE DADOS -->
   <article class="card" style="margin-top:10px;">
-    <h2 style="text-align:center;">Selecione a quantidade</h2>
+    <h2 style="text-align:center;">📋 Seus dados</h2>
 
-    <div id="opcoes" style="margin-top:20px;display:flex;flex-direction:column;gap:12px;">
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:14px;">
 
-      <button class="whatsappButton opcao" data-qtd="1" data-preco="2.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654042.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220984105556304BAB4" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+      <div>
+        <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">RA</label>
+        <input type="text" id="ra" placeholder="Digite seu RA" style="width:100%;padding:12px;border-radius:10px;border:1px solid #7c35ff;background:#1a1a2e;color:white;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <div>
+        <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">Digi</label>
+        <input type="text" id="digi" placeholder="Digite seu Digi" style="width:100%;padding:12px;border-radius:10px;border:1px solid #7c35ff;background:#1a1a2e;color:white;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <div>
+        <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">Senha da conta</label>
+        <input type="password" id="senha" placeholder="Digite sua senha" style="width:100%;padding:12px;border-radius:10px;border:1px solid #7c35ff;background:#1a1a2e;color:white;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+      <div>
+        <label style="color:#aaa;font-size:0.85rem;display:block;margin-bottom:6px;">WhatsApp (com DDD)</label>
+        <input type="tel" id="whatsapp" placeholder="Ex: 12 99999-9999" style="width:100%;padding:12px;border-radius:10px;border:1px solid #7c35ff;background:#1a1a2e;color:white;font-size:1rem;box-sizing:border-box;">
+      </div>
+
+    </div>
+
+    <!-- AVISO -->
+    <div style="margin-top:20px;padding:14px;background:rgba(255,193,7,0.1);border:1px solid #ffc107;border-radius:10px;">
+      <p style="color:#ffc107;font-size:0.9rem;margin:0;">
+        ⚠️ <b>AVISO:</b> Após o pagamento, as atividades serão entregues em até <b>1 dia útil</b>. O serviço não é instantâneo — você receberá uma mensagem no WhatsApp confirmando o pagamento e, em seguida, as atividades prontas.
+      </p>
+    </div>
+
+    <!-- BOTÃO PARA LIBERAR SELEÇÃO -->
+    <button id="btnContinuar" style="background:#7c35ff;display:block;width:100%;margin-top:20px;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;font-size:1rem;box-sizing:border-box;">
+      ✅ Continuar para pagamento
+    </button>
+
+    <p id="erroForm" style="color:#ff4444;font-size:0.85rem;display:none;margin-top:10px;">⚠️ Preencha todos os campos acima.</p>
+
+  </article>
+
+  <!-- SELEÇÃO DE ATIVIDADES (inicialmente oculta) -->
+  <article class="card" id="secaoAtividades" style="margin-top:20px;display:none;">
+    <h2 style="text-align:center;">📝 Selecione a quantidade</h2>
+
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:12px;">
+
+      <button class="opcao" data-qtd="1" data-preco="2.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654042.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220984105556304BAB4" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
         📝 1 atividade — R$ 2,50
       </button>
 
-      <button class="whatsappButton opcao" data-qtd="2" data-preco="4.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654044.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220985113116304FAEC" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+      <button class="opcao" data-qtd="2" data-preco="4.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654044.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220985113116304FAEC" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
         📝 2 atividades — R$ 4,50
       </button>
 
-      <button class="whatsappButton opcao" data-qtd="3" data-preco="6.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654046.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr190792209857366763049E7A" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+      <button class="opcao" data-qtd="3" data-preco="6.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654046.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr190792209857366763049E7A" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
         📝 3 atividades — R$ 6,50
       </button>
 
-      <button class="whatsappButton opcao" data-qtd="4" data-preco="8.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654048.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr190792209863444163041327" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+      <button class="opcao" data-qtd="4" data-preco="8.50" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654048.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr190792209863444163041327" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
         📝 4 atividades — R$ 8,50
       </button>
 
-      <button class="whatsappButton opcao" data-qtd="5" data-preco="10.00" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654049.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220986902836304F36A" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
+      <button class="opcao" data-qtd="5" data-preco="10.00" data-pix="00020126330014br.gov.bcb.pix01115759323180152040000530398654049.505802BR5924Pedro Henrique  Machado 6009Sao Paulo62240520daqr19079220986902836304F36A" style="background:#7c35ff;display:block;width:100%;padding:14px;color:white;border-radius:10px;font-weight:bold;border:none;cursor:pointer;box-sizing:border-box;">
         📝 5 atividades — R$ 10,00
       </button>
 
     </div>
 
-    <!-- ÁREA DO PIX (inicialmente oculta) -->
+    <!-- ÁREA DO PIX -->
     <div id="areaPix" style="display:none;margin-top:24px;text-align:center;">
       <h3 style="color:#7c35ff;margin-bottom:8px;">💰 Pague via PIX</h3>
       <p id="valorPix" style="font-size:1.4rem;font-weight:bold;color:white;"></p>
       <p style="color:#aaa;font-size:0.9rem;margin-bottom:12px;">Copie o código abaixo e cole no app do seu banco</p>
-      <textarea id="codigoPix" readonly rows="4" style="width:100%;padding:12px;border-radius:10px;border:1px solid #7c35ff;background:#1a1a2e;color:white;font-size:0.75rem;resize:none;box-sizing:border-box;"></textarea>
+      <textarea id="codigoPix" readonly rows="4" style="width:100%;padding:12px;border-radius:10px;border:1px solid #7c35ff;background:#1a1a2e;color:white;font-size:0.75rem;resize:none;box-sizing:border-box;word-break:break-all;"></textarea>
       <button id="btnCopiar" style="background:#7c35ff;color:white;border:none;padding:14px 28px;border-radius:10px;font-weight:bold;font-size:1rem;cursor:pointer;margin-top:12px;width:100%;box-sizing:border-box;">
         📋 Copiar código PIX
       </button>
       <p id="msgCopiado" style="color:#4caf50;margin-top:10px;display:none;">✅ Código copiado! Cole no app do banco.</p>
+
+      <div style="margin-top:20px;padding:14px;background:rgba(76,175,80,0.1);border:1px solid #4caf50;border-radius:10px;">
+        <p style="color:#4caf50;font-size:0.85rem;margin:0;">
+          ✅ Após o pagamento, você receberá uma mensagem no WhatsApp informando que o pagamento foi confirmado. As atividades serão entregues em até <b>1 dia útil</b>.
+        </p>
+      </div>
     </div>
 
   </article>
+
 </section>
 
 <footer>
@@ -77,6 +128,28 @@
 </main>
 
 <script>
+// Dados do formulário
+const btnContinuar = document.getElementById('btnContinuar');
+const secaoAtividades = document.getElementById('secaoAtividades');
+const erroForm = document.getElementById('erroForm');
+
+btnContinuar.addEventListener('click', () => {
+  const ra = document.getElementById('ra').value.trim();
+  const digi = document.getElementById('digi').value.trim();
+  const senha = document.getElementById('senha').value.trim();
+  const whatsapp = document.getElementById('whatsapp').value.trim();
+
+  if (!ra || !digi || !senha || !whatsapp) {
+    erroForm.style.display = 'block';
+    return;
+  }
+
+  erroForm.style.display = 'none';
+  secaoAtividades.style.display = 'block';
+  secaoAtividades.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+// Seleção de atividades
 const botoes = document.querySelectorAll('.opcao');
 const areaPix = document.getElementById('areaPix');
 const valorPix = document.getElementById('valorPix');
@@ -88,18 +161,17 @@ botoes.forEach(btn => {
   btn.addEventListener('click', () => {
     const preco = btn.dataset.preco;
     const pix = btn.dataset.pix;
-    const qtd = btn.dataset.qtd;
 
     valorPix.textContent = `Total: R$ ${preco.replace('.', ',')}`;
     codigoPix.value = pix;
     areaPix.style.display = 'block';
     msgCopiado.style.display = 'none';
 
-    // Scroll suave até o PIX
     areaPix.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 });
 
+// Copiar PIX
 btnCopiar.addEventListener('click', () => {
   codigoPix.select();
   codigoPix.setSelectionRange(0, 99999);
@@ -110,7 +182,6 @@ btnCopiar.addEventListener('click', () => {
       btnCopiar.textContent = '📋 Copiar código PIX';
     }, 3000);
   }).catch(() => {
-    // Fallback para navegadores antigos
     document.execCommand('copy');
     msgCopiado.style.display = 'block';
   });
