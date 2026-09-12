@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #0a0a1a;
+  background: #0a1a0a;
   color: #fff;
   min-height: 100vh;
   overflow-x: hidden;
@@ -20,9 +20,9 @@ body::before {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle at 30% 50%, rgba(124, 53, 255, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 70% 80%, rgba(0, 210, 255, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 50% 20%, rgba(255, 0, 150, 0.08) 0%, transparent 50%);
+  background: radial-gradient(circle at 30% 50%, rgba(0, 255, 65, 0.12) 0%, transparent 50%),
+              radial-gradient(circle at 70% 80%, rgba(0, 200, 83, 0.1) 0%, transparent 50%),
+              radial-gradient(circle at 50% 20%, rgba(155, 89, 182, 0.06) 0%, transparent 50%);
   animation: float 15s ease-in-out infinite;
   z-index: 0;
 }
@@ -48,13 +48,13 @@ body::before {
 .glow1 {
   top: -100px;
   right: -100px;
-  background: linear-gradient(135deg, #7c35ff, #00d2ff);
+  background: linear-gradient(135deg, #00ff41, #00c853);
 }
 
 .glow2 {
   bottom: -100px;
   left: -100px;
-  background: linear-gradient(135deg, #ff0096, #7c35ff);
+  background: linear-gradient(135deg, #00c853, #00ff41);
   animation-delay: 3s;
 }
 
@@ -75,20 +75,20 @@ header {
   align-items: center;
   gap: 8px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(0, 210, 255, 0.3);
+  border: 1px solid rgba(0, 255, 65, 0.3);
   padding: 8px 16px;
   border-radius: 50px;
   font-size: 0.8rem;
   font-weight: bold;
   letter-spacing: 1px;
-  color: #00d2ff;
+  color: #00ff41;
   backdrop-filter: blur(10px);
 }
 
 .status span {
   width: 8px;
   height: 8px;
-  background: #00ff88;
+  background: #00ff41;
   border-radius: 50%;
   animation: blink 2s ease-in-out infinite;
 }
@@ -127,7 +127,7 @@ main {
 .hero h1 {
   font-size: 2.4rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #00d2ff, #7c35ff, #ff0096);
+  background: linear-gradient(135deg, #00ff41, #00c853, #00e676);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -152,7 +152,7 @@ main {
 
 .card {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(124, 53, 255, 0.2);
+  border: 1px solid rgba(0, 255, 65, 0.2);
   border-radius: 20px;
   padding: 28px;
   backdrop-filter: blur(20px);
@@ -168,7 +168,7 @@ main {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(124, 53, 255, 0.05), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.05), transparent);
   transition: left 0.5s ease;
 }
 
@@ -177,16 +177,16 @@ main {
 }
 
 .card:hover {
-  border-color: rgba(0, 210, 255, 0.4);
+  border-color: rgba(0, 255, 65, 0.4);
   transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(124, 53, 255, 0.15);
+  box-shadow: 0 20px 40px rgba(0, 255, 65, 0.15);
 }
 
 /* TAG */
 .tag {
   display: inline-block;
-  background: linear-gradient(135deg, #00d2ff, #7c35ff);
-  color: white;
+  background: linear-gradient(135deg, #00ff41, #00c853);
+  color: #0a1a0a;
   font-size: 0.7rem;
   font-weight: bold;
   padding: 4px 12px;
@@ -215,7 +215,7 @@ main {
 
 .whatsappButton:hover {
   transform: scale(1.02) !important;
-  box-shadow: 0 8px 25px rgba(124, 53, 255, 0.4) !important;
+  box-shadow: 0 8px 25px rgba(0, 255, 65, 0.4) !important;
 }
 
 /* FOOTER */
